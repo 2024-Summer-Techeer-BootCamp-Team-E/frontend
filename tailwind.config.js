@@ -3,7 +3,6 @@ module.exports = {
   content: ['./public/index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-
       colors: {
         mainBg: '#F8F6F4',
         orange: '#FF7425',
@@ -14,4 +13,4 @@ module.exports = {
     },
   },
   plugins: [],
-};
+}
