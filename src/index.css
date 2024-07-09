@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+.bg-gradient-text {
+  background: linear-gradient(90deg, #ff9981 11.5%, #ee7a5e 53.5%, #f38469 78%, #e86f52 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 @font-face {
   font-family: 'GmarketSansTTFMedium';
   font-weight: normal;
