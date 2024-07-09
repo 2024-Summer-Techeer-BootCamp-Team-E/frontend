@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'GmarketSansTTFMedium';
+  font-weight: normal;
+  src: url('./fonts/GmarketSansTTFMedium.ttf') format('truetype');
+}
+
+body {
+  font-family: 'GmarketSansTTFMedium';
+}
