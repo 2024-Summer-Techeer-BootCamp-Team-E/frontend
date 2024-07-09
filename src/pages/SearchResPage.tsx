@@ -1,26 +1,33 @@
-import Menu from '../assets/images/Me.png'
-import Test from '../assets/images/SearchTest1.png'
-import Glass from '../assets/images/Glass.png'
-import ALiProducts from '../components/SearchRes/ALiProducts'
-import { useState } from 'react'
+import Me from '../assets/images/Me.png'
 import Footer from '../components/Footer'
+import Glass from '../assets/images/Glass.png'
+import Test from '../assets/images/SearchTest1.png'
+import ALiProducts from '../components/SearchRes/ALiProducts'
+import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 export default function SearchResPage() {
+  const navigate = useNavigate()
   const [menu, setMenu] = useState(false)
   const handleClickMenu = () => {
     setMenu(!menu)
+  }
+  const HandleClickLogo = () => {
+    navigate('/')
   }
   return (
     <div className="flex">
       <div className="flex flex-col items-center w-screen h-screen">
         <div className="flex flex-col justify-center gap-5">
           <div className="relative flex items-center justify-between px-6 bg-mainBg w-[62.5rem] h-14 mt-5">
-            <span className="text-2xl font-bold text-hongsi">알뜰살뜰</span>
+            <span className="text-2xl font-bold cursor-pointer text-hongsi" onClick={HandleClickLogo}>
+              알뜰살뜰
+            </span>
             <div className="relative">
               <input className="w-[500px] h-9 bg-white border rounded-lg outline-none pl-8 text-black/40" placeholder="www.example.com" />
               <img src={Glass} alt="돋보기" className="absolute w-5 h-5 left-2 top-2" />
             </div>
-            <img src={Menu} alt="menu" className="w-12 h-12" onClick={handleClickMenu} />
+            <img src={Me} alt="menu" className="w-12 h-12 cursor-pointer" onClick={handleClickMenu} />
             {menu && (
               <div className="absolute -right-28 top-1">
                 <div className="relative w-24 gap-2 p-2 text-center rounded-lg shadow-xl h-28 bg-mainBg">
@@ -33,7 +40,6 @@ export default function SearchResPage() {
               </div>
             )}
           </div>
-
           <div className="w-[62.5rem] bg-mainBg h-64 flex justify-center items-center">
             <div className="flex items-center justify-center w-1/2">
               <img src={Test} className="w-52 h-52" />
