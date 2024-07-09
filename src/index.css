@@ -7,3 +7,13 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+@font-face {
+  font-family: 'GmarketSansTTFMedium';
+  font-weight: normal;
+  src: url('./fonts/GmarketSansTTFMedium.ttf') format('truetype');
+}
+
+body {
+  font-family: 'GmarketSansTTFMedium';
+}
