@@ -1,7 +1,8 @@
-import Me from '../assets/images/Me.png'
 import Footer from '../components/Footer'
 import Glass from '../assets/images/Glass.png'
 import Test from '../assets/images/SearchTest1.png'
+import HamburgerMenu from '../components/HamburgerMenu'
+import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
@@ -15,6 +16,9 @@ export default function SearchResPage() {
   const HandleClickLogo = () => {
     navigate('/')
   }
+  const HandleClickLiked = () => {
+    navigate('/liked')
+  }
   return (
     <div className="flex">
       <div className="flex flex-col items-center w-screen h-screen">
@@ -27,15 +31,22 @@ export default function SearchResPage() {
               <input className="w-[500px] h-9 bg-white border rounded-lg outline-none pl-8 text-black/40" placeholder="www.example.com" />
               <img src={Glass} alt="돋보기" className="absolute w-5 h-5 left-2 top-2" />
             </div>
-            <img src={Me} alt="menu" className="w-12 h-12 cursor-pointer" onClick={handleClickMenu} />
+            <div onClick={handleClickMenu}>
+              <HamburgerMenu />
+            </div>
+
             {menu && (
-              <div className="absolute -right-28 top-1">
-                <div className="relative w-24 gap-2 p-2 text-center rounded-lg shadow-xl h-28 bg-mainBg">
-                  <p className="hover:text-orange">Home</p>
-                  <p className="hover:text-orange">Liked</p>
-                  <p className="hover:text-orange">Setting</p>
-                  <p className="hover:text-orange">Sign out</p>
-                  <div className="absolute w-4 h-4 transform rotate-45 -translate-x-1/2 bg-mainBg top-2 shadow-xl -left-0.5" />
+              <div className="absolute -right-40 top-1">
+                <div className="relative flex flex-col items-center justify-center w-32 gap-4 p-2 text-center rounded-lg shadow-xl h-44 bg-mainBg">
+                  <button className="hover:text-hongsi" onClick={HandleClickLogo}>
+                    Home
+                  </button>
+                  <button className="hover:text-hongsi" onClick={HandleClickLiked}>
+                    Liked
+                  </button>
+                  <button className="hover:text-hongsi">Setting</button>
+                  <button className="hover:text-hongsi">Sign out</button>
+                  <div className="absolute w-5 h-5 transform rotate-45 -translate-x-1/2 shadow-xl bg-mainBg top-2 -left-0.5" />
                 </div>
               </div>
             )}
@@ -47,10 +58,11 @@ export default function SearchResPage() {
             <div className="flex flex-col w-1/2 gap-5 pl-6 pr-20 font-semibold">
               <p className="text-base">UV차단 초경량 완전자동 3단 암막 자동우산 튼튼한 미니 양우산</p>
               <p className="text-lg text-black/50">Delivery : ₩ 2500</p>
-              <p className="text-2xl text-orange">₩ 2500</p>
-              <div className="flex justify-between">
-                <button className="w-40 text-sm font-semibold text-white rounded-md h-7 bg-hongsi/70 hover:bg-hongsi">Share</button>
-                <button className="w-40 text-sm font-semibold text-white rounded-md h-7 bg-hongsi/70 hover:bg-hongsi">Viste Link</button>
+              <p className="text-2xl text-hongsi">₩ 2500</p>
+              <div className="flex justify-around">
+                <OriginBtn>Share</OriginBtn>
+                <div />
+                <OriginBtn>Visit Link</OriginBtn>
               </div>
             </div>
           </div>
