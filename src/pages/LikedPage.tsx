@@ -1,27 +1,44 @@
 import Glass from '../assets/images/Glass.png'
 import BarChart from '../components/Liked/LineChart'
+import HamburgerMenu from '../components/HamburgerMenu'
 import CategoryBtn from '../components/Liked/CategoryBtn'
-import Del from '../assets/images/Del.png'
 import LikedProduct from '../components/Liked/LikedProduct'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 export default function LikedPage() {
   const navigate = useNavigate()
+  const [menu, setMenu] = useState(false)
+  const handleClickMenu = () => {
+    setMenu(!menu)
+  }
   const HandleClickLogo = () => {
     navigate('/')
-  }
-  const HandleClickDel = () => {
-    navigate('/searchres')
   }
   return (
     <div className="w-screen h-screen">
       <div className="flex flex-col items-center">
-        <div className="flex px-6 items-center justify-between w-[62.5rem] h-14 my-6 bg-mainBg">
+        <div className="flex px-6 relative items-center justify-between w-[62.5rem] h-14 my-6 bg-mainBg">
           <span className="text-2xl font-bold cursor-pointer text-hongsi" onClick={HandleClickLogo}>
             알뜰살뜰
           </span>
-          <img src={Del} alt="x" className="w-6 h-6" onClick={HandleClickDel} />
+          <div className="absolute right-3" onClick={handleClickMenu}>
+            <HamburgerMenu />
+          </div>
+          {menu && (
+            <div className="relative -right-44 top-12">
+              <div className="relative flex flex-col items-center justify-center w-32 gap-4 p-2 text-center rounded-lg shadow-xl h-36 bg-mainBg">
+                <button className="hover:text-hongsi" onClick={HandleClickLogo}>
+                  Home
+                </button>
+                <button className="hover:text-hongsi">Setting</button>
+                <button className="hover:text-hongsi">Sign out</button>
+                <div className="absolute w-4 h-4 transform rotate-45 -translate-x-1/2 bg-mainBg top-2 shadow-xl -left-0.5" />
+              </div>
+            </div>
+          )}
         </div>
+
         <div className="flex px-6 items-center justify-between w-[62.5rem] bg-mainBg h-14">
           <span className="text-2xl font-bold text-black">좋아요</span>
           <div className="relative">
