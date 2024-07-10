@@ -10,6 +10,9 @@ module.exports = {
         footer: '#001E42',
         lightorange: '#F3A261',
       },
+      backdropBlur: {
+        '2px': '2px',
+      },
     },
   },
   plugins: [],
