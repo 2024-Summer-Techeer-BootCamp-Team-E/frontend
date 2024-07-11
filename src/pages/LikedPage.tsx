@@ -1,7 +1,7 @@
 import Glass from '../assets/images/Glass.png'
-import BarChart from '../components/Liked/LineChart'
 import HamburgerMenu from '../components/HamburgerMenu'
 import CategoryBtn from '../components/Liked/CategoryBtn'
+import DoughnutChat from '../components/Liked/DoughnutChat'
 import LikedProduct from '../components/Liked/LikedProduct'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
@@ -31,7 +31,7 @@ export default function LikedPage() {
                 <button className="hover:text-hongsi" onClick={HandleClickLogo}>
                   Home
                 </button>
-                <button className="hover:text-hongsi">Setting</button>
+                <button className="hover:text-hongsi">Github</button>
                 <button className="hover:text-hongsi">Sign out</button>
                 <div className="absolute w-4 h-4 transform rotate-45 -translate-x-1/2 bg-mainBg top-2 shadow-xl -left-0.5" />
               </div>
@@ -62,17 +62,15 @@ export default function LikedPage() {
           <div className="flex font-bold">
             <p className="w-[550px]">품목</p>
             <span className="w-40 text-black/50">배송비</span>
-            <span className="w-40 text-orange">가격</span>
+            <span className="w-40 text-hongsi">가격</span>
           </div>
-          <LikedProduct />
-          <LikedProduct />
           <LikedProduct />
           <LikedProduct />
           <LikedProduct />
         </div>
         <div className="w-[62.5rem] py-2 h-[620px] border-[7px] border-mainBg m-10">
-          <p className="m-6 text-lg font-bold text-center">가격별 카테고리</p>
-          <BarChart />
+          <p className="m-6 text-2xl font-bold text-center">총 할인율</p>
+          <DoughnutChat />
         </div>
       </div>
     </div>

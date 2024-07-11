@@ -17,9 +17,9 @@ export default function ALiProducts() {
           {/* 좋아요 누를때 효과나 알림 주면 좋을 듯 */}
         </div>
       </div>
-      <p className="text-base">UV 차단 미니 접이식 파라솔</p>
-      <p className="text-xs text-black/50">Delivery : ₩ 2500</p>
-      <p className="mt-2 text-lg text-orange">₩ 1000</p>
+      <p className="text-base">샤오미 미지아 스마트 DC 인버터 선풍기, 업그레이드 버전</p>
+      <p className="text-xs text-black/50">Delivery : ₩ 2000</p>
+      <p className="mt-2 text-lg text-hongsi">₩ 25000</p>
     </div>
   )
 }

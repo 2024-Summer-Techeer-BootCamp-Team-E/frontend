@@ -1,6 +1,6 @@
 import Footer from '../components/Footer'
 import Glass from '../assets/images/Glass.png'
-import Test from '../assets/images/SearchTest1.png'
+import Test from '../assets/images/SearchTest2.jpg'
 import HamburgerMenu from '../components/HamburgerMenu'
 import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
@@ -44,7 +44,7 @@ export default function SearchResPage() {
                   <button className="hover:text-hongsi" onClick={HandleClickLiked}>
                     Liked
                   </button>
-                  <button className="hover:text-hongsi">Setting</button>
+                  <button className="hover:text-hongsi">Github</button>
                   <button className="hover:text-hongsi">Sign out</button>
                   <div className="absolute w-5 h-5 transform rotate-45 -translate-x-1/2 shadow-xl bg-mainBg top-2 -left-0.5" />
                 </div>
@@ -56,9 +56,9 @@ export default function SearchResPage() {
               <img src={Test} className="w-52 h-52" />
             </div>
             <div className="flex flex-col w-1/2 gap-5 pl-6 pr-20 font-semibold">
-              <p className="text-base">UV차단 초경량 완전자동 3단 암막 자동우산 튼튼한 미니 양우산</p>
+              <p className="text-base">샤오미 무선 선풍기 BLDC 무소음 2PRO 정발 한국판</p>
               <p className="text-lg text-black/50">Delivery : ₩ 2500</p>
-              <p className="text-2xl text-hongsi">₩ 2500</p>
+              <p className="text-2xl text-hongsi">₩ 20000</p>
               <div className="flex justify-around">
                 <OriginBtn>Share</OriginBtn>
                 <div />
