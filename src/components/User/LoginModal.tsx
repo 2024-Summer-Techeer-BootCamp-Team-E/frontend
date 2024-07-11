@@ -19,7 +19,7 @@ const LoginModal = ({ closeLoginModal, openSignupModal }: LoginModalProps) => {
         <input className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11" placeholder="Password" type="password" />
         <button className="mt-5 text-xl font-bold text-white border rounded-lg shadow-lg w-80 h-11 bg-hongsi">로그인</button>
         <div className="flex items-center justify-end mt-3">
-          <button className="text-sm cursor-pointer text-hongsi" onClick={openSignupModal}>
+          <button className="text-sm cursor-pointer text-hongsi hover:underline" onClick={openSignupModal}>
             회원가입
           </button>
         </div>
