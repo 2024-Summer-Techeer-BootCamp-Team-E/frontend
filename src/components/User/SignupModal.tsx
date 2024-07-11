@@ -20,7 +20,7 @@ const SignupModal = ({ closeSignupModal, openLoginModal }: SignupModalProps) => 
         <input className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11" placeholder="Repeat Password" type="password" />
         <button className="mt-5 text-xl font-bold text-white border rounded-lg shadow-lg w-80 h-11 bg-hongsi">가입하기</button>
         <div className="flex items-center justify-end mt-3">
-          <p className="text-sm cursor-pointer text-hongsi" onClick={openLoginModal}>
+          <p className="text-sm cursor-pointer text-hongsi hover:underline" onClick={openLoginModal}>
             로그인
           </p>
         </div>
