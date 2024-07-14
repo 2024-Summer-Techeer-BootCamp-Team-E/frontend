@@ -20,7 +20,7 @@ export default function SearchResPage() {
     navigate('/liked')
   }
   return (
-    <div className="flex flex-col justify-start w-screen h-screen items-cente">
+    <div className="flex flex-col justify-start w-screen h-screen">
       <div className="flex flex-col items-center gap-5 px-2">
         <div className="flex items-center justify-between px-6 bg-mainBg w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] h-14 mt-5">
           <span className="text-2xl font-bold cursor-pointer text-hongsi" onClick={HandleClickLogo}>
