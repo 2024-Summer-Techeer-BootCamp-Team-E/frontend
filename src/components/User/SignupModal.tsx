@@ -18,6 +18,7 @@ const SignupModal = ({ closeSignupModal, openLoginModal }: SignupModalProps) => 
   const handleSignup = async () => {
     if (password !== repeatPassword) {
       alert('비밀번호가 일치하지 않습니다.')
+
       return
     }
 
@@ -28,6 +29,8 @@ const SignupModal = ({ closeSignupModal, openLoginModal }: SignupModalProps) => 
         name,
       })
       console.log(response.data)
+      closeSignupModal()
+      openLoginModal()
     } catch (error) {
       console.log('Error', error)
     }
