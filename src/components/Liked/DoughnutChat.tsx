@@ -15,19 +15,20 @@ const data = {
 }
 
 const options = {
-  scales: {
-    y: {
-      beginAtZero: true,
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
     },
   },
 }
-
 function DoughnutChat() {
   return (
-    <div className="flex items-center justify-center">
-      <div className="relative w-1/2">
+    <div className="flex items-center justify-center h-auto">
+      <div className="relative w-full h-64 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl sm:h-80 md:h-96 lg:h-112 xl:h-128">
         <Doughnut data={data} options={options} />
-        <span className="absolute text-5xl bottom-52 right-40">40 %</span>
+        <span className="absolute pt-6 pl-4 text-3xl transform translate-x-1/2 translate-y-1/2 sm:text-4xl sm:pl-1 xl:text-5xl bottom-1/2 right-1/2">40%</span>
       </div>
     </div>
   )
