@@ -1,19 +1,11 @@
-import React from 'react'
 import { useState } from 'react'
 import axios from 'axios'
-
-interface SignupModalProps {
-  closeSignupModal: () => void
-  openLoginModal: () => void
-}
-
-const SignupModal = ({ closeSignupModal, openLoginModal }: SignupModalProps) => {
-  // const [email, setEmail] = useState('')
+import useModalStore from '../../store/useModalStore'
+const SignupModal = () => {
+  const { closeSignupModal, openLoginModal } = useModalStore()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
-  const name = 'lyk'
-  const [user_id, setUser_id] = useState('')
-  // const [name, setName] = useState('')
 
   const handleSignup = async () => {
     if (password !== repeatPassword) {
@@ -23,11 +15,12 @@ const SignupModal = ({ closeSignupModal, openLoginModal }: SignupModalProps) => 
 
     try {
       const response = await axios.post('http://localhost:8000/api/v1/accounts/register/', {
-        user_id,
+        email,
         password,
-        name,
       })
       console.log(response.data)
+      closeSignupModal()
+      openLoginModal()
     } catch (error) {
       console.log('Error', error)
     }
@@ -42,12 +35,7 @@ const SignupModal = ({ closeSignupModal, openLoginModal }: SignupModalProps) => 
             X
           </p>
         </div>
-        <input
-          className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11"
-          placeholder="example@email.com"
-          value={user_id}
-          onChange={(e) => setUser_id(e.target.value)}
-        />
+        <input className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11" placeholder="example@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input
           className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11"
           placeholder="Password"
@@ -55,7 +43,6 @@ const SignupModal = ({ closeSignupModal, openLoginModal }: SignupModalProps) => 
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-
         <input
           className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11"
           placeholder="Repeat Password"
@@ -63,7 +50,6 @@ const SignupModal = ({ closeSignupModal, openLoginModal }: SignupModalProps) => 
           value={repeatPassword}
           onChange={(e) => setRepeatPassword(e.target.value)}
         />
-
         <button className="mt-5 text-xl font-bold text-white border rounded-lg shadow-lg w-80 h-11 bg-hongsi" onClick={handleSignup}>
           가입하기
         </button>
