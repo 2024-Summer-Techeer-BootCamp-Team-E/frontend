@@ -20,8 +20,9 @@ export default function LikedPage() {
   const HandleClickLogo = () => {
     navigate('/')
   }
-  const TOKEN =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIxMTUwODIwLCJpYXQiOjE3MjExMjkyMjAsImp0aSI6IjdiMjVjODg0ZmM2MTQyYWRhMTA4NjU5OGVhYWQ5ZmZkIiwidXNlcl9pZCI6MX0.y3jMCTlaQL3ycSNTkipvbsnCBd7VnWzP2oRS86Fcbz4'
+  const getToken = () => {
+    return localStorage.getItem('accessToken')
+  }
   const name = '나이키 에어 줌 알파플라이 넥스트% 3 블루프린트'
   const price = '320000'
   const delivery_charge = '2000'
@@ -30,11 +31,17 @@ export default function LikedPage() {
   const category_id = 7
 
   const GetLikes = async () => {
+    const token = getToken()
+    if (!token) {
+      console.log('토큰이 없습니다.')
+      return
+    }
+
     try {
       const response = await axios.get('http://localhost:8000/api/v1/likes', {
         headers: {
           accept: 'application/json',
-          Authorization: TOKEN,
+          Authorization: `Bearer ${token}`,
         },
       })
       console.log(response.data)
@@ -46,6 +53,12 @@ export default function LikedPage() {
   }
 
   const HandleClickLike = async () => {
+    const token = getToken()
+    if (!token) {
+      console.log('토큰이 없습니다.')
+      return
+    }
+
     try {
       const response = await axios.post(
         'http://localhost:8000/api/v1/likes/',
@@ -60,7 +73,7 @@ export default function LikedPage() {
         {
           headers: {
             accept: 'application/json',
-            Authorization: TOKEN,
+            Authorization: `Bearer ${token}`,
           },
         },
       )
