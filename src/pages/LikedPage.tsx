@@ -1,20 +1,82 @@
+import axios from 'axios'
+import useLikeP from '../store/useLikeP'
 import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
 import CategoryBtn from '../components/Liked/CategoryBtn'
 import DoughnutChat from '../components/Liked/DoughnutChat'
 import LikedProduct from '../components/Liked/LikedProduct'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 
 export default function LikedPage() {
   const navigate = useNavigate()
   const [menu, setMenu] = useState(false)
-  const handleClickMenu = () => {
+  const { likeP, updateLikeState } = useLikeP()
+
+  const HandleClickMenu = () => {
     setMenu(!menu)
   }
+
   const HandleClickLogo = () => {
     navigate('/')
   }
+  const TOKEN =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIxMTI0OTMzLCJpYXQiOjE3MjExMDMzMzMsImp0aSI6IjEyODIyOTA1N2NlODQ5OGJhNGNmMTkyMmE5YTlkNjM3IiwidXNlcl9pZCI6MX0.6rw4-4u0pMoNtjjFjqfSealI3fLi5Dr4xMUOAFCaWhk'
+  const name = '나이키 에어 줌 알파플라이 넥스트% 3 블루프린트'
+  const price = '320000'
+  const delivery_charge = '2000'
+  const link = 'https://kream.co.kr/products/307550?fetchRelated=true'
+  const image_url = 'https://static.shoeprize.com/Raffle/thumb/HF7357-900-shoeprize-NIKE-AIR-ZOOM-ALPHAFLY-3-BLUE-PRINT-415465-1719305582107.jpg'
+  const category_id = 7
+
+  const GetLikes = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/v1/likes', {
+        headers: {
+          accept: 'application/json',
+          Authorization: TOKEN,
+        },
+      })
+      console.log(response.data)
+      updateLikeState(response.data)
+      console.log('Get 성공')
+    } catch (error) {
+      console.log('실패')
+    }
+  }
+
+  const HandleClickLike = async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/api/v1/likes/',
+        {
+          name,
+          price,
+          delivery_charge,
+          link,
+          image_url,
+          category_id,
+        },
+        {
+          headers: {
+            accept: 'application/json',
+            Authorization: TOKEN,
+          },
+        },
+      )
+      console.log(response.data)
+      console.log('성공')
+      alert('POST 성공!')
+      GetLikes() // POST 요청 성공 후 GET 요청 호출 (좋아요 내역 최신화)
+    } catch (error) {
+      console.log('실패')
+    }
+  }
+
+  useEffect(() => {
+    GetLikes()
+  }, [])
+
   return (
     <div className="w-screen h-screen">
       <div className="flex flex-col items-center px-2">
@@ -22,7 +84,7 @@ export default function LikedPage() {
           <span className="text-2xl font-bold cursor-pointer text-hongsi" onClick={HandleClickLogo}>
             알뜰살뜰
           </span>
-          <div className="absolute right-3" onClick={handleClickMenu}>
+          <div className="absolute right-3" onClick={HandleClickMenu}>
             <HamburgerMenu />
           </div>
           {menu && (
@@ -32,7 +94,10 @@ export default function LikedPage() {
                 <button className="hover:text-hongsi" onClick={HandleClickLogo}>
                   Home
                 </button>
-                <button className="hover:text-hongsi">Github</button>
+                <button className="hover:text-hongsi" onClick={HandleClickLike}>
+                  {/* 임시로 post 버튼을 만듦 */}
+                  Github
+                </button>
                 <button className="hover:text-hongsi">Sign out</button>
               </div>
             </div>
@@ -60,13 +125,13 @@ export default function LikedPage() {
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem]  h-auto gap-4 border-[7px] border-mainBg p-5 ">
           <div className="flex font-bold">
-            <p className="w-[550px]">품목</p>
+            <p className="lg:w-[580px] w-[500px]">품목</p>
             <span className="hidden w-40 sm:block text-black/50">배송비</span>
             <span className="hidden w-40 sm:block text-hongsi">가격</span>
           </div>
-          <LikedProduct />
-          <LikedProduct />
-          <LikedProduct />
+          {likeP.map((product) => (
+            <LikedProduct key={product.id} {...product} />
+          ))}
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] py-2 h-auto border-[7px] border-mainBg m-10">
           <p className="m-6 text-2xl font-bold text-center">총 할인율</p>

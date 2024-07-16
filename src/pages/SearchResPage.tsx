@@ -22,7 +22,7 @@ export default function SearchResPage() {
   return (
     <div className="flex flex-col justify-start w-screen h-screen">
       <div className="flex flex-col items-center gap-5 px-2">
-        <div className="flex items-center justify-between px-6 bg-mainBg w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] h-14 mt-5">
+        <div className="flex relative items-center justify-between px-6 bg-mainBg w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] h-14 mt-5">
           <span className="text-2xl font-bold cursor-pointer text-hongsi" onClick={HandleClickLogo}>
             알뜰살뜰
           </span>
@@ -34,8 +34,8 @@ export default function SearchResPage() {
             <HamburgerMenu />
           </div>
           {menu && (
-            <div className="absolute z-10 border xl:right-10 xl:top-7 top-24 border-black/5 right-10">
-              <div className="z-0 absolute w-5 h-5 transform rotate-45 border border-black/3 -translate-x-1/2 shadow-xl bg-mainBg xl:top-2 xl:-left-[1px] -top-2 left-28 sm:left-20" />
+            <div className="absolute z-10 border xl:-right-40 xl:top-2 top-20 border-black/5 right-5">
+              <div className="z-0 absolute w-5 h-5 transform rotate-45 border border-black/3 -translate-x-1/2 shadow-xl bg-mainBg xl:top-2 xl:-left-[1px] -top-2 left-24 " />
               <div className="relative flex flex-col items-center justify-center w-32 gap-4 p-2 text-center shadow-xl h-44 bg-mainBg">
                 <button className="hover:text-hongsi" onClick={HandleClickLogo}>
                   Home
