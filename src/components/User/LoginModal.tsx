@@ -1,30 +1,24 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
+import useModalStore from '../../store/useModalStore'
 
-interface LoginModalProps {
-  closeLoginModal: () => void
-  openSignupModal: () => void
-}
-
-const LoginModal = ({ closeLoginModal, openSignupModal }: LoginModalProps) => {
-  const name = 'lyk'
-  const [user_id, setUser_id] = useState('')
-  // const [email, setEmail] = useState('')
+const LoginModal = () => {
+  const { closeLoginModal, openSignupModal } = useModalStore()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://localhost:8000/api/v1/accounts/login/', {
-        user_id,
+        email,
         password,
-        name,
       })
 
-      const { token } = response.data
-      localStorage.setItem('token', token)
-      closeLoginModal()
+      localStorage.setItem('accessToken', response.data.access)
+      localStorage.setItem('refreshToken', response.data.refresh)
 
-      console.log(response.data)
+      closeLoginModal()
+      window.location.reload()
     } catch (error) {
       console.log('Error', error)
     }
@@ -39,14 +33,7 @@ const LoginModal = ({ closeLoginModal, openSignupModal }: LoginModalProps) => {
             X
           </button>
         </div>
-        <input
-          className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11"
-          placeholder="example@email.com"
-          value={user_id}
-          onChange={(e) => setUser_id(e.target.value)}
-          // value={email}
-          // onChangeCapture={(e)=> setEmail(e.target.value)}
-        />
+        <input className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11" placeholder="example@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input
           className="pl-5 mt-5 text-lg text-black bg-white border rounded-lg outline-none w-80 h-11"
           placeholder="Password"
