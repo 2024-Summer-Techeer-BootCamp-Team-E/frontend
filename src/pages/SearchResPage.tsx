@@ -1,14 +1,15 @@
 import Footer from '../components/Footer'
 import Glass from '../assets/images/Glass.png'
-import Test from '../assets/images/SearchTest2.jpg'
 import HamburgerMenu from '../components/HamburgerMenu'
 import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export default function SearchResPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const data = location.state.data
   const [menu, setMenu] = useState(false)
   const handleClickMenu = () => {
     setMenu(!menu)
@@ -51,16 +52,16 @@ export default function SearchResPage() {
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-64 flex justify-center items-center">
           <div className="flex items-center justify-center w-1/2">
-            <img src={Test} className="w-40 h-40 sm:w-52 sm:h-52" />
+            <img src={data.image_url} className="w-40 h-40 sm:w-52 sm:h-52" />
           </div>
           <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold">
-            <p className="text-sm sm:text-base">샤오미 무선 선풍기 BLDC 무소음 2PRO 정발 한국판</p>
-            <p className="text-sm sm:text-base text-black/50">Delivery : ₩ 2500</p>
-            <p className="text-lg sm:text-2xl text-hongsi">₩ 20000</p>
+            <p className="text-sm sm:text-base">{data.name}</p>
+            <p className="text-sm sm:text-base text-black/50">Delivery : ₩ {data.delivery_charge}</p>
+            <p className="text-lg sm:text-2xl text-hongsi">₩ {data.price}</p>
             <div className="flex justify-around">
-              <OriginBtn>Share</OriginBtn>
+              <OriginBtn link={data.search_url}>Share</OriginBtn>
               <div />
-              <OriginBtn>Visit Link</OriginBtn>
+              <OriginBtn link={data.search_url}>Visit Link</OriginBtn>
             </div>
           </div>
         </div>

@@ -1,18 +1,22 @@
-import { motion } from 'framer-motion'
+import axios from 'axios'
 import Main from '../../assets/images/Main.png'
 import Search from '../../assets/images/Search.png'
 import { useState } from 'react'
-import axios from 'axios'
+import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 
 export default function MainSection1() {
+  const navigate = useNavigate()
   const [url, setUrl] = useState('')
   const handleClickSubmit = async () => {
+    console.log('클릭')
     try {
-      const response = await axios.post('/api/v1/products/scrape', {
+      const response = await axios.post('/api/v1/products/scrape/', {
         url,
       })
       console.log('링크: ', url)
-      console.log(response.data[0].data)
+      console.log(response.data)
+      navigate('/searchres', { state: { data: response.data } })
     } catch (error) {
       console.log('Error', error)
     }
