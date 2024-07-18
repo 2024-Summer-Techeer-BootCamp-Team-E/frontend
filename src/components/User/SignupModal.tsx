@@ -14,7 +14,7 @@ const SignupModal = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/accounts/register/', {
+      const response = await axios.post('/api/v1/accounts/register/', {
         email,
         password,
       })

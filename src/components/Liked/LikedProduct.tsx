@@ -17,7 +17,7 @@ interface LikedProducts {
 const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
   const token = localStorage.getItem('accessToken')
   return axios.post(
-    'http://localhost:8000/api/v1/likes/',
+    '/api/v1/likes/',
     {
       name: faker.commerce.productName(),
       price: faker.commerce.price(),
@@ -46,7 +46,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
   useQuery({
     queryKey: ['product'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:8000/api/v1/likes', {
+      const response = await fetch('/api/v1/likes', {
         headers: {
           accept: 'application/json',
           Authorization: `Bearer ${token}`,
@@ -72,7 +72,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
     },
   })
   const deleteLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    return axios.delete('http://localhost:8000/api/v1/likes/', {
+    return axios.delete('/api/v1/likes/', {
       headers: {
         accept: 'application/json',
         Authorization: `Bearer ${token}`,
