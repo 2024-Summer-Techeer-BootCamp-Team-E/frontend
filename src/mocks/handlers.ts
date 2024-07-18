@@ -5,7 +5,7 @@ export const handlers = [
     const data = await request.json()
     return HttpResponse.json([
       {
-        urlData: data.url,
+        urlData: data,
         code: 'P001',
         status: '201',
         message: 'hihi',
