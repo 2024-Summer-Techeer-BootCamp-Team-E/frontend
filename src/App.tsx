@@ -13,6 +13,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<MainPage />} />
+          <Route path="/home" element={<MainPage />} />
           <Route path="/searchres" element={<SearchResPage />} />
           <Route path="/liked" element={<LikedPage />} />
         </Routes>
