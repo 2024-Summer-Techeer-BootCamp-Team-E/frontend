@@ -2,7 +2,6 @@ import axios, { AxiosResponse } from 'axios'
 import Like from '../../assets/images/Like.png'
 import Liked from '../../assets/images/Liked.png'
 import { useState } from 'react'
-import { faker } from '@faker-js/faker'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 interface LikedProducts {
@@ -14,26 +13,6 @@ interface LikedProducts {
   image_url: string
   category_id: number
 }
-const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-  const token = localStorage.getItem('accessToken')
-  return axios.post(
-    'http://localhost:8000/api/v1/likes/',
-    {
-      name: faker.commerce.productName(),
-      price: faker.commerce.price(),
-      delivery_charge: faker.commerce.price(),
-      link: faker.internet.url(),
-      image_url: faker.image.url(),
-      category_id: 7,
-    },
-    {
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  )
-}
 export default function LikedProduct({ id, name, price, link, delivery_charge, image_url, category_id }: LikedProducts) {
   const queryClient = useQueryClient()
   const [like, setLike] = useState(true)
@@ -43,10 +22,31 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
     window.open(link, '_blank')
   }
 
+  const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
+    const token = localStorage.getItem('accessToken')
+    return axios.post(
+      '/api/v1/likes/',
+      {
+        name,
+        price,
+        delivery_charge,
+        link,
+        image_url,
+        category_id,
+      },
+      {
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+  }
+
   useQuery({
     queryKey: ['product'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:8000/api/v1/likes', {
+      const response = await fetch('/api/v1/likes', {
         headers: {
           accept: 'application/json',
           Authorization: `Bearer ${token}`,
@@ -63,21 +63,21 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
     onSuccess: () => {
       console.log('좋아요 성공')
       // 요청 성공 시 해당 queryKey 유효성 제거
-      queryClient.invalidateQueries({
-        queryKey: ['product'],
-      })
+      // queryClient.invalidateQueries({
+      //   queryKey: ['product'],
+      // })
     },
     onError: () => {
       console.error('에러 발생')
     },
   })
   const deleteLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    return axios.delete('http://localhost:8000/api/v1/likes/', {
+    return axios.delete('http://localhost:8000/api/v1/likes', {
+      data: { id },
       headers: {
         accept: 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      data: { id },
     })
   }
 
@@ -85,9 +85,9 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
     mutationFn: deleteLike,
     onSuccess: () => {
       console.log('삭제 성공')
-      queryClient.invalidateQueries({
-        queryKey: ['product'],
-      })
+      // queryClient.invalidateQueries({
+      //   queryKey: ['product'],
+      // })
       alert('좋아요 취소!')
     },
     onError: () => {
@@ -95,7 +95,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
     },
   })
   const handlePostDate = () => {
-    setLike(false)
+    setLike(true)
     postMutation.mutate()
   }
   const handleDeleteDate = () => {
