@@ -15,6 +15,7 @@ const Header = ({ token }: { token: string | null }) => {
 
     navigate('/')
     window.location.reload()
+    alert('로그아웃 성공')
   }
 
   return (

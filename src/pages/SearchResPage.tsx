@@ -39,13 +39,13 @@ export default function SearchResPage() {
               <div className="z-0 absolute w-5 h-5 transform rotate-45 border border-black/3 -translate-x-1/2 shadow-xl bg-mainBg xl:top-2 xl:-left-[1px] -top-2 left-24 " />
               <div className="relative flex flex-col items-center justify-center w-32 gap-4 p-2 text-center shadow-xl h-44 bg-mainBg">
                 <button className="hover:text-hongsi" onClick={HandleClickLogo}>
-                  Home
+                  메인페이지
                 </button>
                 <button className="hover:text-hongsi" onClick={HandleClickLiked}>
-                  Liked
+                  좋아요
                 </button>
-                <button className="hover:text-hongsi">Github</button>
-                <button className="hover:text-hongsi">Sign out</button>
+                <button className="hover:text-hongsi">깃허브</button>
+                <button className="hover:text-hongsi">로그아웃</button>
               </div>
             </div>
           )}
