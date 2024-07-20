@@ -85,9 +85,9 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
     mutationFn: deleteLike,
     onSuccess: () => {
       console.log('삭제 성공')
-      // queryClient.invalidateQueries({
-      //   queryKey: ['product'],
-      // })
+      queryClient.invalidateQueries({
+        queryKey: ['product'],
+      })
       alert('좋아요 취소!')
     },
     onError: () => {
