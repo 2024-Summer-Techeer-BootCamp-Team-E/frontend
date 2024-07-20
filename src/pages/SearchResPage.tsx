@@ -84,17 +84,16 @@ export default function SearchResPage() {
             </div>
           )}
         </div>
-        <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-64 flex justify-center items-center">
+        <div className="w-full sm:pr-4 sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-64 flex justify-center items-center">
           <div className="flex items-center justify-center w-1/2">
             <img src={data.image_url} className="w-40 h-40 sm:w-52 sm:h-52" />
           </div>
-          <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold">
+          <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold ">
             <p className="text-sm sm:text-base">{data.name}</p>
             <p className="text-sm sm:text-base text-black/50">Delivery : ₩ {data.delivery_charge}</p>
             <p className="text-lg sm:text-2xl text-hongsi">₩ {data.price}</p>
-            <div className="flex justify-around">
+            <div className="flex justify-between">
               <OriginBtn link={data.search_url}>Share</OriginBtn>
-              <div />
               <OriginBtn link={data.search_url}>Visit Link</OriginBtn>
             </div>
           </div>
