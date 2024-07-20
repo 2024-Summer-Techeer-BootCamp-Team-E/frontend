@@ -3,13 +3,15 @@ import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
 import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 export default function SearchResPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const data = location.state.data
+  const [ali, setAli] = useState([])
   const [menu, setMenu] = useState(false)
   const handleClickMenu = () => {
     setMenu(!menu)
@@ -20,6 +22,36 @@ export default function SearchResPage() {
   const HandleClickLiked = () => {
     navigate('/liked')
   }
+  const handleClickKeyword = async () => {
+    console.log('클릭')
+    try {
+      const response = await axios.post('/api/v1/products/keyword/', {
+        name: data.name,
+      })
+      console.log('상품네임: ', data.name)
+      console.log(response.data[0])
+      // navigate('/searchres', { state: { data: response.data } })
+    } catch (error) {
+      console.log('Error', error)
+    }
+  }
+  const handleClickAli = async () => {
+    console.log('클릭')
+    try {
+      const response = await axios.post('/api/v1/products/info', {
+        url: data.url,
+      })
+      console.log('상품 링크: ', data.name)
+      console.log(response.data)
+      setAli(response.data)
+      console.log('알리알리 : ', ali)
+    } catch (error) {
+      console.log('Error', error)
+    }
+  }
+  useEffect(() => {
+    handleClickAli()
+  }, [])
   return (
     <div className="flex flex-col justify-start w-screen h-screen">
       <div className="flex flex-col items-center gap-5 px-2">
@@ -44,37 +76,33 @@ export default function SearchResPage() {
                 <button className="hover:text-hongsi" onClick={HandleClickLiked}>
                   좋아요
                 </button>
-                <button className="hover:text-hongsi">깃허브</button>
+                <button className="hover:text-hongsi" onClick={handleClickKeyword}>
+                  깃허브
+                </button>
                 <button className="hover:text-hongsi">로그아웃</button>
               </div>
             </div>
           )}
         </div>
-        <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-64 flex justify-center items-center">
+        <div className="w-full sm:pr-4 sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-64 flex justify-center items-center">
           <div className="flex items-center justify-center w-1/2">
             <img src={data.image_url} className="w-40 h-40 sm:w-52 sm:h-52" />
           </div>
-          <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold">
+          <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold ">
             <p className="text-sm sm:text-base">{data.name}</p>
             <p className="text-sm sm:text-base text-black/50">Delivery : ₩ {data.delivery_charge}</p>
             <p className="text-lg sm:text-2xl text-hongsi">₩ {data.price}</p>
-            <div className="flex justify-around">
+            <div className="flex justify-between">
               <OriginBtn link={data.search_url}>Share</OriginBtn>
-              <div />
               <OriginBtn link={data.search_url}>Visit Link</OriginBtn>
             </div>
           </div>
         </div>
 
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] grid lg:grid-cols-4 grid-cols-3 gap-3 mb-10">
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
+          {ali.map((product: any) => (
+            <ALiProducts key={product.id} {...product} />
+          ))}
         </div>
       </div>
       <Footer />
