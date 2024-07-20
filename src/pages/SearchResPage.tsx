@@ -3,13 +3,15 @@ import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
 import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 export default function SearchResPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const data = location.state.data
+  const [ali, setAli] = useState([])
   const [menu, setMenu] = useState(false)
   const handleClickMenu = () => {
     setMenu(!menu)
@@ -20,6 +22,36 @@ export default function SearchResPage() {
   const HandleClickLiked = () => {
     navigate('/liked')
   }
+  const handleClickKeyword = async () => {
+    console.log('클릭')
+    try {
+      const response = await axios.post('/api/v1/products/keyword/', {
+        name: data.name,
+      })
+      console.log('상품네임: ', data.name)
+      console.log(response.data[0])
+      // navigate('/searchres', { state: { data: response.data } })
+    } catch (error) {
+      console.log('Error', error)
+    }
+  }
+  const handleClickAli = async () => {
+    console.log('클릭')
+    try {
+      const response = await axios.post('/api/v1/products/info', {
+        url: data.url,
+      })
+      console.log('상품 링크: ', data.name)
+      console.log(response.data)
+      setAli(response.data)
+      console.log('알리알리 : ', ali)
+    } catch (error) {
+      console.log('Error', error)
+    }
+  }
+  useEffect(() => {
+    handleClickAli()
+  }, [])
   return (
     <div className="flex flex-col justify-start w-screen h-screen">
       <div className="flex flex-col items-center gap-5 px-2">
@@ -44,7 +76,9 @@ export default function SearchResPage() {
                 <button className="hover:text-hongsi" onClick={HandleClickLiked}>
                   Liked
                 </button>
-                <button className="hover:text-hongsi">Github</button>
+                <button className="hover:text-hongsi" onClick={handleClickKeyword}>
+                  Github
+                </button>
                 <button className="hover:text-hongsi">Sign out</button>
               </div>
             </div>
@@ -67,14 +101,9 @@ export default function SearchResPage() {
         </div>
 
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] grid lg:grid-cols-4 grid-cols-3 gap-3 mb-10">
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
-          <ALiProducts />
+          {ali.map((product: any) => (
+            <ALiProducts key={product.id} {...product} />
+          ))}
         </div>
       </div>
       <Footer />
