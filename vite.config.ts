@@ -1,15 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path' //추가
+import path from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
     host: true,
     proxy: {
-      '/api': 'http://localhost:8000',
+      // '/api': 'http://localhost:8000',
+      '/api': 'http://backend:8000',  // 수정된 부분
     },
   },
   resolve: {
