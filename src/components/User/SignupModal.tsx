@@ -27,7 +27,7 @@ const SignupModal = () => {
   }
 
   return (
-    <div className="fixed top-0 z-20 flex items-center justify-center w-screen h-screen snap-none bg-black/30 backdrop-blur-[2px]">
+    <div className="fixed left-0 top-0 z-20 flex items-center justify-center w-screen h-screen snap-none bg-black/30 backdrop-blur-[2px]">
       <div className="rounded-2xl shadow-lg w-[390px] h-[350px] bg-white px-9">
         <div className="flex items-center justify-between">
           <p className="mt-4 text-xl font-semibold">회원가입</p>

@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import { AxiosResponse } from 'axios'
 import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
 import CategoryBtn from '../components/Liked/CategoryBtn'
@@ -9,6 +9,8 @@ import { faker } from '@faker-js/faker'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
+import Cookies from 'js-cookie'
+import axiosInstance from '../components/User/axiosInstance'
 
 interface LikedProducts {
   id: number
@@ -22,6 +24,7 @@ interface LikedProducts {
 
 export default function LikedPage() {
   const navigate = useNavigate()
+  const token = localStorage.getItem('accessToken')
   const queryClient = useQueryClient()
   const [menu, setMenu] = useState(false)
   const [page, setPage] = useState(1)
@@ -29,10 +32,10 @@ export default function LikedPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [data, setData] = useState<LikedProducts[]>([])
   const [allData, setAllData] = useState<LikedProducts[]>([]) // This will store all the fetched data
+  const [totalCount, setTotalCount] = useState(0) // Store the total count of the data
 
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    const token = localStorage.getItem('accessToken')
-    return axios.post(
+    return axiosInstance.post(
       '/api/v1/likes/',
       {
         name: faker.commerce.productName(),
@@ -54,8 +57,7 @@ export default function LikedPage() {
   const fetchData = async () => {
     setIsLoading(true)
     try {
-      const token = localStorage.getItem('accessToken')
-      const response = await axios.get('/api/v1/likes', {
+      const response = await axiosInstance.get('/api/v1/likes', {
         headers: {
           accept: 'application/json',
           Authorization: `Bearer ${token}`,
@@ -63,11 +65,12 @@ export default function LikedPage() {
       })
       const newData = response.data
       console.log('데이터 : ', newData)
+      setTotalCount(newData.length) // Update the total count
       if (newData.length === 0) {
         setHasMore(false)
       } else {
         setAllData(newData) // Store all the data
-        setData(newData.slice(0, 5)) // Initially set the first 10 items
+        setData(newData.slice(0, 5)) // Initially set the first 5 items
       }
     } catch (error) {
       console.error('Error:', error)
@@ -78,12 +81,19 @@ export default function LikedPage() {
   }
 
   useEffect(() => {
-    fetchData()
+    if (token) {
+      fetchData()
+    } else {
+      navigate('/')
+      alert('로그인을 먼저 해주세요!')
+    }
   }, [])
 
   useEffect(() => {
     if (page > 1) {
-      const nextData = allData.slice((page - 1) * 2, page * 2)
+      const startIndex = 5 + (page - 2) * 2
+      const endIndex = startIndex + 2
+      const nextData = allData.slice(startIndex, endIndex)
       setData((prevData) => [...prevData, ...nextData])
       if (nextData.length < 2) {
         setHasMore(false)
@@ -125,9 +135,9 @@ export default function LikedPage() {
 
   const logout = () => {
     localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
+    Cookies.remove('refreshToken')
     navigate('/')
-    window.location.reload()
+
     alert('로그아웃 성공')
   }
 
@@ -167,7 +177,7 @@ export default function LikedPage() {
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] px-4 text-base font-bold gap-2 mt-4">
           {isLoading && <p>Loading...</p>}
-          {data && <p>전체 {data.length}개</p>}
+          {data && <p>전체 {totalCount}개</p>} {/* Update to show total count */}
           <div className="flex gap-3 my-4 sm:gap-6">
             <CategoryBtn>전체</CategoryBtn>
             <CategoryBtn>의류</CategoryBtn>

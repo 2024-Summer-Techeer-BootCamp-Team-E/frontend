@@ -6,13 +6,20 @@ import ALiProducts from '../components/SearchRes/ALiProducts'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import LoginModal from '../components/User/LoginModal'
+import useModalStore from '../store/useModalStore'
+import Cookies from 'js-cookie'
+import SignupModal from '../components/User/SignupModal'
 
 export default function SearchResPage() {
+  const { isLoginModalOpen, isSignupModalOpen, openLoginModal, openSignupModal } = useModalStore()
+
   const navigate = useNavigate()
   const location = useLocation()
   const data = location.state.data
   const [ali, setAli] = useState([])
   const [menu, setMenu] = useState(false)
+  const token = localStorage.getItem('accessToken')
   const handleClickMenu = () => {
     setMenu(!menu)
   }
@@ -20,7 +27,11 @@ export default function SearchResPage() {
     navigate('/')
   }
   const HandleClickLiked = () => {
-    navigate('/liked')
+    if (token) {
+      navigate('/liked')
+    } else {
+      alert('로그인이 필요합니다.')
+    }
   }
   const handleClickKeyword = async () => {
     console.log('클릭')
@@ -34,6 +45,16 @@ export default function SearchResPage() {
     } catch (error) {
       console.log('Error', error)
     }
+  }
+  const logout = () => {
+    localStorage.removeItem('accessToken')
+
+    Cookies.remove('refreshToken')
+
+    // Navigate to home and reload
+    navigate('/')
+    window.location.reload()
+    alert('로그아웃 성공')
   }
   const handleClickAli = async () => {
     console.log('클릭')
@@ -79,7 +100,17 @@ export default function SearchResPage() {
                 <button className="hover:text-hongsi" onClick={handleClickKeyword}>
                   깃허브
                 </button>
-                <button className="hover:text-hongsi">로그아웃</button>
+                {token ? (
+                  <button className="hover:text-hongsi" onClick={logout}>
+                    로그아웃
+                  </button>
+                ) : (
+                  <button className="hover:text-hongsi" onClick={openLoginModal}>
+                    로그인
+                  </button>
+                )}
+                {isLoginModalOpen && <LoginModal />}
+                {isSignupModalOpen && <SignupModal />}
               </div>
             </div>
           )}
