@@ -16,8 +16,8 @@ interface LikedProducts {
   id: number
   name: string
   link: string
-  price: string
-  delivery_charge: string
+  price: number
+  delivery_charge: number
   image_url: string
   category_id: number
 }
@@ -39,8 +39,8 @@ export default function LikedPage() {
       '/api/v1/likes/',
       {
         name: faker.commerce.productName(),
-        price: faker.commerce.price(),
-        delivery_charge: faker.commerce.price(),
+        price: 1000,
+        delivery_charge: 0,
         link: faker.internet.url(),
         image_url: faker.image.url(),
         category_id: 7,
