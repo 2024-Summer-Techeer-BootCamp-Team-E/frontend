@@ -10,15 +10,26 @@ import LoginModal from '../components/User/LoginModal'
 import useModalStore from '../store/useModalStore'
 import Cookies from 'js-cookie'
 import SignupModal from '../components/User/SignupModal'
-
+import { useInView } from 'react-intersection-observer'
+interface ALiState {
+  product_name: string
+  price: string
+  delivery_charge: string
+  link: string
+  image_url: string
+  category_id: number
+  id: number
+}
 export default function SearchResPage() {
-  const { isLoginModalOpen, isSignupModalOpen, openLoginModal, openSignupModal } = useModalStore()
-
+  const { isLoginModalOpen, isSignupModalOpen, openLoginModal } = useModalStore()
   const navigate = useNavigate()
   const location = useLocation()
-  const data = location.state.data
-  const [ali, setAli] = useState([])
+  const linkData = location.state.data
+  const [data, setData] = useState<ALiState[]>([])
+  const [page, setPage] = useState(1)
   const [menu, setMenu] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const token = localStorage.getItem('accessToken')
   const handleClickMenu = () => {
     setMenu(!menu)
@@ -37,42 +48,64 @@ export default function SearchResPage() {
     console.log('클릭')
     try {
       const response = await axios.post('/api/v1/products/keyword/', {
-        name: data.name,
+        name: linkData.name,
       })
-      console.log('상품네임: ', data.name)
+      console.log('상품네임: ', linkData.name)
       console.log(response.data[0])
-      // navigate('/searchres', { state: { data: response.data } })
     } catch (error) {
       console.log('Error', error)
     }
   }
   const logout = () => {
     localStorage.removeItem('accessToken')
-
     Cookies.remove('refreshToken')
-
-    // Navigate to home and reload
     navigate('/')
     window.location.reload()
     alert('로그아웃 성공')
   }
-  const handleClickAli = async () => {
+  const fetchAli = async (currentPage: number) => {
+    setIsLoading(true)
     console.log('클릭')
     try {
       const response = await axios.post('/api/v1/products/info', {
-        url: data.url,
+        url: linkData.url,
       })
-      console.log('상품 링크: ', data.name)
-      console.log(response.data)
-      setAli(response.data)
-      console.log('알리알리 : ', ali)
+      const newData = response.data.map((item: ALiState, index: number) => ({
+        ...item,
+        id: index + currentPage * 1000,
+      }))
+      console.log('데이터 : ', newData)
+      if (newData.length === 0) {
+        setHasMore(false)
+      } else {
+        const paginatedData = newData.slice((currentPage - 1) * 4, currentPage * 4)
+        if (paginatedData.length < 4) {
+          setHasMore(false)
+        }
+        setData((prevData) => {
+          const combinedData = [...prevData, ...paginatedData]
+          const uniqueData = combinedData.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i)
+          return uniqueData
+        })
+      }
     } catch (error) {
-      console.log('Error', error)
+      console.error('Error:', error)
+      setHasMore(false)
+    } finally {
+      setIsLoading(false)
     }
   }
   useEffect(() => {
-    handleClickAli()
-  }, [])
+    fetchAli(page)
+  }, [page])
+  const { ref } = useInView({
+    threshold: 0.2,
+    onChange: (inView) => {
+      if (inView && hasMore && !isLoading) {
+        setPage((prevPage) => prevPage + 1)
+      }
+    },
+  })
   return (
     <div className="flex flex-col justify-start w-screen h-screen">
       <div className="flex flex-col items-center gap-5 px-2">
@@ -117,24 +150,22 @@ export default function SearchResPage() {
         </div>
         <div className="w-full sm:pr-4 sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-64 flex justify-center items-center">
           <div className="flex items-center justify-center w-1/2">
-            <img src={data.image_url} className="w-40 h-40 sm:w-52 sm:h-52" />
+            <img src={linkData.image_url} className="w-40 h-40 sm:w-52 sm:h-52" />
           </div>
           <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold ">
-            <p className="text-sm sm:text-base">{data.name}</p>
-            <p className="text-sm sm:text-base text-black/50">Delivery : ₩ {data.delivery_charge}</p>
-            <p className="text-lg sm:text-2xl text-hongsi">₩ {data.price}</p>
+            <p className="text-sm sm:text-base">{linkData.name}</p>
+            <p className="text-sm sm:text-base text-black/50">Delivery : ₩ {linkData.delivery_charge}</p>
+            <p className="text-lg sm:text-2xl text-hongsi">₩ {linkData.price}</p>
             <div className="flex justify-between">
-              <OriginBtn link={data.search_url}>Share</OriginBtn>
-              <OriginBtn link={data.search_url}>Visit Link</OriginBtn>
+              <OriginBtn link={linkData.search_url}>Share</OriginBtn>
+              <OriginBtn link={linkData.search_url}>Visit Link</OriginBtn>
             </div>
           </div>
         </div>
-
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] grid lg:grid-cols-4 grid-cols-3 gap-3 mb-10">
-          {ali.map((product: any) => (
-            <ALiProducts key={product.id} {...product} />
-          ))}
+          {data && data.map((product: any) => <ALiProducts key={product.id} {...product} />)}
         </div>
+        {hasMore && !isLoading && <div ref={ref} />}
       </div>
       <Footer />
     </div>
