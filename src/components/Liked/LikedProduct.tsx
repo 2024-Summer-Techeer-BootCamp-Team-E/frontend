@@ -8,8 +8,8 @@ interface LikedProducts {
   id: number
   name: string
   link: string
-  price: string
-  delivery_charge: string
+  price: number
+  delivery_charge: number
   image_url: string
   category_id: number
 }
