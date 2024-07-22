@@ -8,8 +8,7 @@ export default defineConfig({
     port: 3000,
     host: true,
     proxy: {
-      // '/api': 'http://localhost:8000',
-      '/api': 'http://backend:8000',  // 수정된 부분
+      '/api': 'http://localhost:8000',
     },
   },
   resolve: {
