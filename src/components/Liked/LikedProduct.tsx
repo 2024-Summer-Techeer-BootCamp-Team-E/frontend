@@ -23,7 +23,6 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
   }
 
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    const token = localStorage.getItem('accessToken')
     return axios.post(
       '/api/v1/likes/',
       {
