@@ -20,6 +20,7 @@ const LoginModal = () => {
       Cookies.set('refreshToken', response.data.refresh)
 
       closeLoginModal()
+      alert('로그인 성공!')
       window.location.reload()
     } catch (error) {
       console.log('Error', error)
