@@ -43,7 +43,7 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
 
   const deleteLike = async (): Promise<AxiosResponse<ALiState>> => {
     if (!pData || !pData.id) {
-      throw new Error('pData는 null이 아니다.')
+      throw new Error('에러 발생')
     }
     return axios.delete('http://localhost:8000/api/v1/likes', {
       data: { id: pData.id },
@@ -57,6 +57,7 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
   const postMutation = useMutation<ALiState, Error, void>({
     mutationFn: postData,
     onSuccess: (data) => {
+      setLike(!like)
       console.log('좋아요 성공')
       queryClient.invalidateQueries({
         queryKey: ['product'],
@@ -65,6 +66,7 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       alert('좋아요 성공!')
     },
     onError: () => {
+      alert('로그인이 필요합니다!')
       console.error('에러 발생')
     },
   })
@@ -72,6 +74,7 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
   const deleteMutation = useMutation<AxiosResponse<ALiState>, Error, void>({
     mutationFn: deleteLike,
     onSuccess: () => {
+      setLike(!like)
       console.log('삭제 성공')
       queryClient.invalidateQueries({
         queryKey: ['product'],
@@ -90,7 +93,6 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
     } else {
       postMutation.mutate()
     }
-    setLike(!like)
   }
 
   const handleClickLink = () => {
