@@ -7,9 +7,11 @@ import { useNavigate } from 'react-router-dom'
 
 export default function MainSection1() {
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
   const [url, setUrl] = useState('')
   const handleClickSubmit = async () => {
     console.log('클릭')
+    setLoading(!loading)
     try {
       const response = await axios.post('/api/v1/products/scrape/', {
         url,
@@ -49,8 +51,19 @@ export default function MainSection1() {
             }
           }}
         />
-        <button className="absolute flex items-center justify-center w-10 h-10 text-white shadow-md md:w-12 md:h-12 rounded-2xl bg-hongsi right-2 focus:outline-none " onClick={handleClickSubmit}>
-          <img src={Search} alt="Search" />
+        <button
+          className="absolute flex items-center justify-center w-10 h-8 text-white shadow-md sm:w-12 sm:h-10 md:w-14 md:h-12 rounded-xl bg-hongsi hover:bg-orange-600 right-2 focus:outline-none "
+          onClick={handleClickSubmit}
+        >
+          {loading ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#FFFFFF" d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z">
+                <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+              </path>
+            </svg>
+          ) : (
+            <img src={Search} alt="Search" className="w-6 h-6 lg:w-7 lg:h-7" />
+          )}
         </button>
       </div>
     </div>
