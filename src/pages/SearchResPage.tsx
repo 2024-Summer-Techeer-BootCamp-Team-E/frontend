@@ -1,36 +1,50 @@
+import axios from 'axios'
+import Cookies from 'js-cookie'
 import Footer from '../components/Footer'
+import Skeleton from 'react-loading-skeleton'
 import Glass from '../assets/images/Glass.png'
+import 'react-loading-skeleton/dist/skeleton.css'
+import useModalStore from '../store/useModalStore'
+import LoginModal from '../components/User/LoginModal'
 import HamburgerMenu from '../components/HamburgerMenu'
+import SignupModal from '../components/User/SignupModal'
 import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
+import SkeletonUI1 from '../components/SearchRes/SkeletonUI1'
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import LoginModal from '../components/User/LoginModal'
-import useModalStore from '../store/useModalStore'
-import Cookies from 'js-cookie'
-import SignupModal from '../components/User/SignupModal'
 import { useInView } from 'react-intersection-observer'
+import { useLocation, useNavigate } from 'react-router-dom'
 interface ALiState {
-  product_name: string
+  name: string
   price: string
   delivery_charge: string
-  link: string
+  search_url: string
   image_url: string
   category_id: number
   id: number
 }
 export default function SearchResPage() {
-  const { isLoginModalOpen, isSignupModalOpen, openLoginModal } = useModalStore()
   const navigate = useNavigate()
   const location = useLocation()
-  const linkData = location.state.data
-  const [data, setData] = useState<ALiState[]>([])
+  const url = location.state.data
   const [page, setPage] = useState(1)
+  const [skUi, setSkUi] = useState(true)
   const [menu, setMenu] = useState(false)
+  const [ui, setUi] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+  const [data, setData] = useState<ALiState[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const token = localStorage.getItem('accessToken')
+  const [linkData, setLinkData] = useState<ALiState>({
+    name: '',
+    price: '',
+    delivery_charge: '',
+    search_url: '',
+    image_url: '',
+    category_id: 0,
+    id: 0,
+  })
+  const { isLoginModalOpen, isSignupModalOpen, openLoginModal } = useModalStore()
   const handleClickMenu = () => {
     setMenu(!menu)
   }
@@ -44,18 +58,6 @@ export default function SearchResPage() {
       alert('로그인이 필요합니다.')
     }
   }
-  const handleClickKeyword = async () => {
-    console.log('클릭')
-    try {
-      const response = await axios.post('/api/v1/products/keyword/', {
-        name: linkData.name,
-      })
-      console.log('상품네임: ', linkData.name)
-      console.log(response.data[0])
-    } catch (error) {
-      console.log('Error', error)
-    }
-  }
   const logout = () => {
     localStorage.removeItem('accessToken')
     Cookies.remove('refreshToken')
@@ -63,41 +65,76 @@ export default function SearchResPage() {
     window.location.reload()
     alert('로그아웃 성공')
   }
+  const postKeyword = async () => {
+    console.log('P유아렐: ', url)
+    try {
+      const response = await axios.post('/api/v1/products/keyword/', {
+        search_url: url,
+      })
+      console.log(response.data)
+    } catch (error) {
+      console.log('Error', error)
+    }
+  }
+
   const fetchAli = async (currentPage: number) => {
     setIsLoading(true)
-    console.log('클릭')
-    try {
-      const response = await axios.post('/api/v1/products/info', {
-        url: linkData.url,
-      })
-      const newData = response.data.map((item: ALiState, index: number) => ({
-        ...item,
-        id: index + currentPage * 1000,
-      }))
-      console.log('데이터 : ', newData)
-      if (newData.length === 0) {
-        setHasMore(false)
-      } else {
-        const paginatedData = newData.slice((currentPage - 1) * 4, currentPage * 4)
-        if (paginatedData.length < 4) {
-          setHasMore(false)
-        }
-        setData((prevData) => {
-          const combinedData = [...prevData, ...paginatedData]
-          const uniqueData = combinedData.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i)
-          return uniqueData
+    console.log('F유아렐: ', linkData.search_url)
+    if (linkData.name) {
+      try {
+        const response = await axios.post('/api/v1/products/info/', {
+          search_url: linkData.search_url,
         })
+        setUi(true)
+        console.log('확인용 : ', response.data)
+        const newData = response.data.map((item: ALiState, index: number) => ({
+          ...item,
+          id: index + currentPage * 1000,
+        }))
+        console.log('데이터 : ', newData)
+        if (newData.length === 0) {
+          setHasMore(false)
+        } else {
+          const paginatedData = newData.slice((currentPage - 1) * 4, currentPage * 4)
+          if (paginatedData.length < 4) {
+            setHasMore(false)
+          }
+          setData((prevData) => {
+            const combinedData = [...prevData, ...paginatedData]
+            const uniqueData = combinedData.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i)
+            return uniqueData
+          })
+        }
+      } catch (error) {
+        console.error('Error:', error)
+        setHasMore(false)
+      } finally {
+        setIsLoading(false)
       }
+    }
+  }
+  const postScrape = async () => {
+    console.log('/에서 온 url : ', url)
+    console.log('스크래핑 중,,, (한 6초 걸릴 듯)')
+    try {
+      const response = await axios.post('/api/v1/products/scrape/', {
+        url,
+      })
+      console.log('링크: ', url)
+      console.log(response.data)
+      setLinkData(response.data)
+      setSkUi(false)
+      await postKeyword()
     } catch (error) {
-      console.error('Error:', error)
-      setHasMore(false)
-    } finally {
-      setIsLoading(false)
+      console.log('Error', error)
     }
   }
   useEffect(() => {
+    postScrape()
+  }, [])
+  useEffect(() => {
     fetchAli(page)
-  }, [page])
+  }, [page, linkData])
   const { ref } = useInView({
     threshold: 0.2,
     onChange: (inView) => {
@@ -130,7 +167,7 @@ export default function SearchResPage() {
                 <button className="hover:text-hongsi" onClick={HandleClickLiked}>
                   좋아요
                 </button>
-                <button className="hover:text-hongsi" onClick={handleClickKeyword}>
+                <button className="hover:text-hongsi" onClick={postKeyword}>
                   깃허브
                 </button>
                 {token ? (
@@ -150,24 +187,37 @@ export default function SearchResPage() {
         </div>
         <div className="w-full sm:pr-4 sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-64 flex justify-center items-center">
           <div className="flex items-center justify-center w-1/2">
-            <img src={linkData.image_url} className="w-40 h-40 sm:w-52 sm:h-52" />
+            {skUi ? <Skeleton className="w-40 h-40 sm:w-52 sm:h-52" /> : <img src={linkData.image_url} className="w-40 h-40 sm:w-52 sm:h-52" />}
           </div>
           <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold ">
-            <p className="text-sm sm:text-base">{linkData.name}</p>
-            <p className="text-sm sm:text-base text-black/50">Delivery : ₩ {linkData.delivery_charge}</p>
-            <p className="text-lg sm:text-2xl text-hongsi">₩ {linkData.price}</p>
-            <div className="flex justify-between">
-              <OriginBtn link={linkData.search_url}>Share</OriginBtn>
-              <OriginBtn link={linkData.search_url}>Visit Link</OriginBtn>
-            </div>
+            <p className="text-sm sm:text-base">{skUi ? <Skeleton className="text-sm sm:text-base" /> : linkData.name}</p>
+            <p className="text-sm sm:text-base text-black/50">{skUi ? <Skeleton className="text-sm sm:text-base" /> : `Delivery : ₩${linkData.delivery_charge}`}</p>
+            <p className="text-lg sm:text-2xl text-hongsi">{skUi ? <Skeleton className="text-sm sm:text-base" /> : `₩${linkData.price}`}</p>
+
+            {skUi ? (
+              <Skeleton className="text-sm sm:text-base" />
+            ) : (
+              <div className="flex justify-between">
+                <OriginBtn link={linkData.search_url}>Share</OriginBtn>
+                <OriginBtn link={linkData.search_url}>Visit Link</OriginBtn>
+              </div>
+            )}
           </div>
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] grid lg:grid-cols-4 grid-cols-3 gap-3 mb-10">
-          {data && data.map((product: any) => <ALiProducts key={product.id} {...product} />)}
+          {ui && !skUi ? (
+            data.map((product: any) => <ALiProducts key={product.id} {...product} />)
+          ) : (
+            <>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <SkeletonUI1 key={index} />
+              ))}
+            </>
+          )}
         </div>
         {hasMore && !isLoading && <div ref={ref} />}
       </div>
-      <Footer />
+      {!hasMore && <Footer />}
     </div>
   )
 }
