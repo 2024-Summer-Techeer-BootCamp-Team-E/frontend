@@ -6,7 +6,6 @@ module.exports = {
       colors: {
         hongsi: '#E86F52',
         mainBg: '#F8F6F4',
-        orange: '#FF7425',
         footer: '#001E42',
         lightorange: '#F3A261',
       },

@@ -1,4 +1,3 @@
-import axios from 'axios'
 import Main from '../../assets/images/Main.png'
 import Search from '../../assets/images/Search.png'
 import { useState } from 'react'
@@ -8,18 +7,8 @@ import { useNavigate } from 'react-router-dom'
 export default function MainSection1() {
   const navigate = useNavigate()
   const [url, setUrl] = useState('')
-  const handleClickSubmit = async () => {
-    console.log('클릭')
-    try {
-      const response = await axios.post('/api/v1/products/scrape/', {
-        url,
-      })
-      console.log('링크: ', url)
-      console.log(response.data)
-      navigate('/searchres', { state: { data: response.data } })
-    } catch (error) {
-      console.log('Error', error)
-    }
+  const handleClickSubmit = () => {
+    navigate('/searchres', { state: { data: url } })
   }
   return (
     <div className="flex flex-col items-center gap-3 justify-center mt-20 w-screen h-[582px] " style={{ backgroundImage: `url(${Main})` }}>
@@ -49,8 +38,11 @@ export default function MainSection1() {
             }
           }}
         />
-        <button className="absolute flex items-center justify-center w-10 h-10 text-white shadow-md md:w-12 md:h-12 rounded-2xl bg-hongsi right-2 focus:outline-none " onClick={handleClickSubmit}>
-          <img src={Search} alt="Search" />
+        <button
+          className="absolute flex items-center justify-center w-10 h-8 text-white shadow-md sm:w-12 sm:h-10 md:w-14 md:h-12 rounded-xl bg-hongsi hover:bg-orange-600 right-2 focus:outline-none "
+          onClick={handleClickSubmit}
+        >
+          <img src={Search} alt="Search" className="w-6 h-6 lg:w-7 lg:h-7" />
         </button>
       </div>
     </div>

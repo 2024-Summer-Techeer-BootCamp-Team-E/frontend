@@ -92,7 +92,7 @@ export default function MainSection2() {
               <p className="text-xl font-bold lg:text-3xl md:text-2xl">합리적인 소비 시작하기</p>
               <p className="text-lightorange mt-0.5 lg:text-2xl md:text-lg text-md font-bold">Start rational consumption.</p>
               <p
-                className="mb-2 font-bold cursor-pointer lg:text-2xl md:text-lg text-md text-orange hover:text-red-600 hover:underline"
+                className="mb-2 font-bold cursor-pointer lg:text-2xl md:text-lg text-md text-hongsi hover:text-red-600 hover:underline"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               >
                 Let's start
