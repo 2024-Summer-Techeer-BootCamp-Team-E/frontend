@@ -21,7 +21,7 @@ const SignupModal = () => {
       console.log(response.data)
       closeSignupModal()
       openLoginModal()
-      alert('축하합니다! 회원가입에 성공하셨습니다!')
+      alert('환영합니다, 회원가입에 성공하셨습니다!')
     } catch (error) {
       console.log('Error', error)
     }
