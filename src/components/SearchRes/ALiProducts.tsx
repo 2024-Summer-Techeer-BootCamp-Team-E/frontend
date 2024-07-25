@@ -1,7 +1,7 @@
 import Like from '../../assets/images/Like.png'
 import Liked from '../../assets/images/Liked.png'
 import { useEffect, useState } from 'react'
-import axios, { AxiosResponse } from 'axios'
+import axiosInstance, { AxiosResponse } from 'axios' // Import the custom axios instance
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -23,8 +23,9 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
   const [loading, setLoading] = useState(true)
   const token = localStorage.getItem('accessToken')
   const [pData, setPData] = useState<ALiState | null>(null)
+
   const postData = async () => {
-    const response = await axios.post<ALiState>(
+    const response = await axiosInstance.post<ALiState>(
       '/api/v1/likes/',
       {
         name: product_name,
@@ -44,11 +45,12 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
     )
     return response.data
   }
+
   const deleteLike = async (): Promise<AxiosResponse<ALiState>> => {
     if (!pData || !pData.id) {
       throw new Error('에러 발생')
     }
-    return axios.delete('http://localhost:8000/api/v1/likes', {
+    return axiosInstance.delete('/api/v1/likes/', {
       data: { id: pData.id },
       headers: {
         accept: 'application/json',
@@ -56,6 +58,7 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       },
     })
   }
+
   const postMutation = useMutation<ALiState, Error, void>({
     mutationFn: postData,
     onSuccess: (data) => {
@@ -72,6 +75,7 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       console.error('에러 발생')
     },
   })
+
   const deleteMutation = useMutation<AxiosResponse<ALiState>, Error, void>({
     mutationFn: deleteLike,
     onSuccess: () => {
@@ -80,13 +84,13 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       queryClient.invalidateQueries({
         queryKey: ['product'],
       })
-
       alert('좋아요 취소!')
     },
     onError: () => {
       console.error('에러 발생')
     },
   })
+
   const handleClickPostDelete = () => {
     if (like) {
       deleteMutation.mutate()
@@ -94,14 +98,17 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       postMutation.mutate()
     }
   }
+
   const handleClickLink = () => {
     window.open(link, '_blank')
   }
+
   useEffect(() => {
     setTimeout(() => {
       setLoading(false)
     }, 500)
   }, [])
+
   return (
     <div className="flex flex-col items-center justify-between gap-2 my-3 font-semibold xl:w-60 lg:w-[216px] md:w-56 w-full">
       {loading ? (

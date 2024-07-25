@@ -3,6 +3,7 @@ import Like from '../../assets/images/Like.png'
 import Liked from '../../assets/images/Liked.png'
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import axiosInstance from '../../components/User/axiosInstance'
 
 interface LikedProducts {
   id: number
@@ -13,6 +14,7 @@ interface LikedProducts {
   image_url: string
   category_id: number
 }
+
 export default function LikedProduct({ id, name, price, link, delivery_charge, image_url, category_id }: LikedProducts) {
   const queryClient = useQueryClient()
   const [like, setLike] = useState(true)
@@ -23,7 +25,10 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
   }
 
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    return axios.post(
+    // Generate a random category_id between 1 and 6
+    const randomCategoryId = Math.floor(Math.random() * 6) + 1
+
+    return axiosInstance.post(
       '/api/v1/likes/',
       {
         name,
@@ -31,7 +36,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
         delivery_charge,
         link,
         image_url,
-        category_id,
+        category_id: randomCategoryId, // Use the random category_id here
       },
       {
         headers: {
@@ -57,6 +62,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
       return response.json()
     },
   })
+
   const postMutation = useMutation<AxiosResponse<LikedProducts>, Error, void>({
     mutationFn: postLike,
     onSuccess: () => {
@@ -70,8 +76,9 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
       console.error('에러 발생')
     },
   })
+
   const deleteLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    return axios.delete('http://localhost:8000/api/v1/likes', {
+    return axiosInstance.delete('http://localhost:8000/api/v1/likes', {
       data: { id },
       headers: {
         accept: 'application/json',
@@ -93,10 +100,12 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
       console.error('에러 발생')
     },
   })
+
   const handlePostDate = () => {
     setLike(true)
     postMutation.mutate()
   }
+
   const handleDeleteDate = () => {
     setLike(false)
     deleteMutation.mutate()
