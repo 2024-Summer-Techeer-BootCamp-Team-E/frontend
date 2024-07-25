@@ -1,9 +1,9 @@
 import { AxiosResponse } from 'axios'
 import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
-import CategoryBtn from '../components/Liked/CategoryBtn'
 import DoughnutChat from '../components/Liked/DoughnutChat'
 import LikedProduct from '../components/Liked/LikedProduct'
+import CategoryBtn from '../components/Liked/CategoryBtn' // Import CategoryBtn
 import { useState, useEffect } from 'react'
 import { faker } from '@faker-js/faker'
 import { useNavigate } from 'react-router-dom'
@@ -33,8 +33,13 @@ export default function LikedPage() {
   const [data, setData] = useState<LikedProducts[]>([])
   const [allData, setAllData] = useState<LikedProducts[]>([]) // This will store all the fetched data
   const [totalCount, setTotalCount] = useState(0) // Store the total count of the data
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null) // State for selected category
+  const [categoryPage, setCategoryPage] = useState(1)
 
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
+    // 1부터 6까지 랜덤 번호
+    const randomCategoryId = Math.floor(Math.random() * 6) + 1
+
     return axiosInstance.post(
       '/api/v1/likes/',
       {
@@ -43,7 +48,7 @@ export default function LikedPage() {
         delivery_charge: 0,
         link: faker.internet.url(),
         image_url: faker.image.url(),
-        category_id: 7,
+        category_id: randomCategoryId, // category id 에 랜덤번호 부여
       },
       {
         headers: {
@@ -64,13 +69,13 @@ export default function LikedPage() {
         },
       })
       const newData = response.data
-      console.log('데이터 : ', newData)
-      setTotalCount(newData.length) // Update the total count
+
+      setTotalCount(newData.length)
       if (newData.length === 0) {
         setHasMore(false)
       } else {
-        setAllData(newData) // Store all the data
-        setData(newData.slice(0, 5)) // Initially set the first 5 items
+        setAllData(newData)
+        setData(newData.slice(0, 5))
       }
     } catch (error) {
       console.error('Error:', error)
@@ -90,22 +95,26 @@ export default function LikedPage() {
   }, [])
 
   useEffect(() => {
-    if (page > 1) {
-      const startIndex = 5 + (page - 2) * 2
+    if ((page > 1 && selectedCategory === null) || (categoryPage > 1 && selectedCategory !== null)) {
+      const startIndex = 5 + ((selectedCategory === null ? page : categoryPage) - 2) * 2
       const endIndex = startIndex + 2
-      const nextData = allData.slice(startIndex, endIndex)
+      const nextData = (selectedCategory === null ? allData : allData.filter((product) => product.category_id === selectedCategory)).slice(startIndex, endIndex)
       setData((prevData) => [...prevData, ...nextData])
       if (nextData.length < 2) {
         setHasMore(false)
       }
     }
-  }, [page, allData])
+  }, [page, categoryPage, selectedCategory, allData])
 
   const { ref } = useInView({
     threshold: 1.0,
     onChange: (inView) => {
       if (inView && hasMore && !isLoading) {
-        setPage((prevPage) => prevPage + 1)
+        if (selectedCategory === null) {
+          setPage((prevPage) => prevPage + 1)
+        } else {
+          setCategoryPage((prevPage) => prevPage + 1)
+        }
       }
     },
   })
@@ -140,6 +149,25 @@ export default function LikedPage() {
 
     alert('로그아웃 성공')
   }
+  const handleCategoryClick = (categoryId: number | null) => {
+    setSelectedCategory(categoryId)
+    if (categoryId === null) {
+      // 좋아요 전체
+      setData(allData.slice(0, 5))
+      setPage(1)
+      setTotalCount(allData.length)
+      setHasMore(true)
+    } else {
+      // 좋아요 카테고리
+      const filtered = allData.filter((product) => product.category_id === categoryId)
+      setData(filtered.slice(0, 5))
+      setCategoryPage(1)
+      setTotalCount(filtered.length) // 카테고리 안에  개수
+      setHasMore(filtered.length > 5)
+    }
+  }
+
+  const displayedData = selectedCategory === null ? data : data.filter((product) => product.category_id === selectedCategory)
 
   return (
     <div className="w-screen h-screen">
@@ -177,15 +205,29 @@ export default function LikedPage() {
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] px-4 text-base font-bold gap-2 mt-4">
           {isLoading && <p>Loading...</p>}
-          {data && <p>전체 {totalCount}개</p>} {/* Update to show total count */}
+          <p>전체 {totalCount}개</p>
           <div className="flex gap-3 my-4 sm:gap-6">
-            <CategoryBtn>전체</CategoryBtn>
-            <CategoryBtn>의류</CategoryBtn>
-            <CategoryBtn>스포츠</CategoryBtn>
-            <CategoryBtn>생활 용품</CategoryBtn>
-            <CategoryBtn>가전</CategoryBtn>
-            <CategoryBtn>가구</CategoryBtn>
-            <CategoryBtn>음식</CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(null)} isSelected={selectedCategory === null}>
+              전체
+            </CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(1)} isSelected={selectedCategory === 1}>
+              의류
+            </CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(2)} isSelected={selectedCategory === 2}>
+              스포츠
+            </CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(3)} isSelected={selectedCategory === 3}>
+              생필
+            </CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(4)} isSelected={selectedCategory === 4}>
+              가전
+            </CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(5)} isSelected={selectedCategory === 5}>
+              가구
+            </CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(6)} isSelected={selectedCategory === 6}>
+              음식
+            </CategoryBtn>
           </div>
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] h-auto gap-4 border-[7px] border-mainBg p-5 ">
@@ -195,7 +237,7 @@ export default function LikedPage() {
             <span className="hidden w-40 sm:block text-hongsi">가격</span>
           </div>
           {isLoading && <p>Loading...</p>}
-          {data && data.map((product: LikedProducts) => <LikedProduct key={product.id} {...product} />)}
+          {displayedData && displayedData.map((product: LikedProducts) => <LikedProduct key={product.id} {...product} />)}
         </div>
         <div>{hasMore && !isLoading && <div ref={ref} />}</div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] py-2 h-auto border-[7px] border-mainBg m-10">

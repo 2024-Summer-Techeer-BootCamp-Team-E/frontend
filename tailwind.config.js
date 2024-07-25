@@ -8,6 +8,7 @@ module.exports = {
         mainBg: '#F8F6F4',
         footer: '#001E42',
         lightorange: '#F3A261',
+        lightgray: '#D9D9D9',
       },
       backdropBlur: {
         '2px': '2px',
