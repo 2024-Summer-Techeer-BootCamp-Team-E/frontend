@@ -8,7 +8,23 @@ const LoginModal = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const validateEmail = (email: string) => {
+    // 이메일 형식 확인을 위한 정규 표현식
+    const re = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/
+    return re.test(email)
+  }
+
   const handleLogin = async () => {
+    if (!validateEmail(email)) {
+      alert('이메일 주소가 유효하지 않습니다.')
+      return
+    }
+
+    if (!password) {
+      alert('비밀번호를 입력하세요.')
+      return
+    }
+
     try {
       const response = await axios.post('/api/v1/accounts/login/', {
         email,
@@ -22,8 +38,13 @@ const LoginModal = () => {
       closeLoginModal()
       alert('로그인 성공!')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       console.log('Error', error)
+      if (error.response && error.response.status === 401) {
+        alert('로그인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.')
+      } else {
+        alert('잘못된 비밀번호입니다.')
+      }
     }
   }
 

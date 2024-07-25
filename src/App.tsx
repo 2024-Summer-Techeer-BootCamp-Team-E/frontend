@@ -18,7 +18,7 @@ function App() {
           <Route path="/liked" element={<LikedPage />} />
         </Routes>
       </Router>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   )
 }
