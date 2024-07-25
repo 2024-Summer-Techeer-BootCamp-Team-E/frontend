@@ -206,7 +206,7 @@ export default function SearchResPage() {
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] grid lg:grid-cols-4 grid-cols-3 gap-3 mb-10">
           {ui && !skUi ? (
-            data.map((product: any) => <ALiProducts key={product.id} {...product} />)
+            data.map((product: any) => <ALiProducts key={product.id} {...product} search_url={linkData.search_url} />)
           ) : (
             <>
               {Array.from({ length: 5 }).map((_, index) => (

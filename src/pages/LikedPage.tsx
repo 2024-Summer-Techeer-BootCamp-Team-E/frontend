@@ -20,6 +20,7 @@ interface LikedProducts {
   delivery_charge: number
   image_url: string
   category_id: number
+  origin_price: number
 }
 
 export default function LikedPage() {
@@ -35,6 +36,8 @@ export default function LikedPage() {
   const [totalCount, setTotalCount] = useState(0) // Store the total count of the data
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null) // State for selected category
   const [categoryPage, setCategoryPage] = useState(1)
+  const [totalOriginalPrice, setTotalOriginalPrice] = useState(0)
+  const [totalDiscountedPrice, setTotalDiscountedPrice] = useState(0)
 
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
     // 1부터 6까지 랜덤 번호
@@ -76,6 +79,11 @@ export default function LikedPage() {
       } else {
         setAllData(newData)
         setData(newData.slice(0, 5))
+
+        const totalOriginalPrice = newData.reduce((sum: number, item: any) => sum + item.origin_price, 0)
+        const totalDiscountedPrice = newData.reduce((sum: number, item: any) => sum + item.price, 0)
+        setTotalOriginalPrice(totalOriginalPrice)
+        setTotalDiscountedPrice(totalDiscountedPrice)
       }
     } catch (error) {
       console.error('Error:', error)
@@ -242,7 +250,7 @@ export default function LikedPage() {
         <div>{hasMore && !isLoading && <div ref={ref} />}</div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] py-2 h-auto border-[7px] border-mainBg m-10">
           <p className="m-6 text-2xl font-bold text-center">총 할인율</p>
-          <DoughnutChat />
+          <DoughnutChat totalOriginalPrice={totalOriginalPrice} totalDiscountedPrice={totalDiscountedPrice} />
         </div>
       </div>
     </div>

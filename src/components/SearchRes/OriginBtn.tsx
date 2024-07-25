@@ -20,7 +20,7 @@ const OriginBtn = ({ children, link }: BtnProps) => {
   }
   return (
     <a
-      className="relative flex items-center px-4 py-1 pl-2 overflow-hidden font-medium border-2 rounded-xl sm:px-5 sm:pl-5 md:pl-6 md:px-12 lg:px-16 text-hongsi border-hongsi hover:text-white group hover:bg-gray-50 whitespace-nowrap"
+      className="relative flex items-center px-4 py-1 pl-2 overflow-hidden font-medium border-2 cursor-pointer rounded-xl sm:px-5 sm:pl-5 md:pl-6 md:px-12 lg:px-16 text-hongsi border-hongsi hover:text-white group hover:bg-gray-50 whitespace-nowrap"
       onClick={handleClick}
     >
       <span className="absolute left-0 block w-full h-0 transition-all opacity-100 bg-hongsi group-hover:h-full top-1/2 group-hover:top-0 duration-400"></span>

@@ -15,9 +15,10 @@ interface ALiState {
   link: string
   image_url: string
   category_id: number
+  search_url: string
 }
 
-export default function ALiProducts({ product_name, price, delivery_charge, link, image_url, category_id }: ALiState) {
+export default function ALiProducts({ product_name, price, delivery_charge, link, image_url, category_id, search_url }: ALiState) {
   const queryClient = useQueryClient()
   const [like, setLike] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -34,7 +35,9 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
         link,
         image_url,
         category_id,
+        search_url,
       },
+
       {
         headers: {
           accept: 'application/json',
@@ -120,10 +123,12 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
               {loading ? (
                 <Skeleton className="xl:h-60 xl:w-60 lg:w-[216px] lg:h-[216px] md:w-56 md:h-56 max-w-56 max-h-56" />
               ) : (
-                <img src={image_url} className="xl:h-60 xl:w-60 lg:w-[216px] lg:h-[216px] md:w-56 md:h-56" onClick={handleClickLink} />
+                <img src={image_url} className="cursor-pointer xl:h-60 xl:w-60 lg:w-[216px] lg:h-[216px] md:w-56 md:h-56" onClick={handleClickLink} />
               )}
             </div>
-            <p className="text-xs sm:text-sm lg:text-base">{loading ? <Skeleton className="" /> : product_name}</p>
+            <p className="text-xs cursor-pointer sm:text-sm lg:text-base" onClick={handleClickLink}>
+              {loading ? <Skeleton className="" /> : product_name}
+            </p>
             <div className="absolute right-2 top-2 ">
               {like ? (
                 <img src={Liked} alt="liked" onClick={handleClickPostDelete} className="w-6 h-6 sm:w-8 sm:h-8" />
