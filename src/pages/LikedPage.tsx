@@ -1,17 +1,17 @@
-import { AxiosResponse } from 'axios'
+import Cookies from 'js-cookie'
+import MenuBtn from '../components/MenuBtn'
 import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
+import CategoryBtn from '../components/Liked/CategoryBtn'
 import DoughnutChat from '../components/Liked/DoughnutChat'
 import LikedProduct from '../components/Liked/LikedProduct'
-import CategoryBtn from '../components/Liked/CategoryBtn' // Import CategoryBtn
-import { useState, useEffect } from 'react'
-import { faker } from '@faker-js/faker'
-import { useNavigate } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useInView } from 'react-intersection-observer'
-import Cookies from 'js-cookie'
 import axiosInstance from '../components/User/axiosInstance'
-
+import { AxiosResponse } from 'axios'
+import { faker } from '@faker-js/faker'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useInView } from 'react-intersection-observer'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 interface LikedProducts {
   id: number
   name: string
@@ -22,7 +22,6 @@ interface LikedProducts {
   category_id: number
   origin_price: number
 }
-
 export default function LikedPage() {
   const navigate = useNavigate()
   const token = localStorage.getItem('accessToken')
@@ -32,17 +31,14 @@ export default function LikedPage() {
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [data, setData] = useState<LikedProducts[]>([])
-  const [allData, setAllData] = useState<LikedProducts[]>([]) // This will store all the fetched data
-  const [totalCount, setTotalCount] = useState(0) // Store the total count of the data
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null) // State for selected category
+  const [allData, setAllData] = useState<LikedProducts[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [categoryPage, setCategoryPage] = useState(1)
   const [totalOriginalPrice, setTotalOriginalPrice] = useState(0)
   const [totalDiscountedPrice, setTotalDiscountedPrice] = useState(0)
-
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    // 1부터 6까지 랜덤 번호
     const randomCategoryId = Math.floor(Math.random() * 6) + 1
-
     return axiosInstance.post(
       '/api/v1/likes/',
       {
@@ -51,7 +47,7 @@ export default function LikedPage() {
         delivery_charge: 0,
         link: faker.internet.url(),
         image_url: faker.image.url(),
-        category_id: randomCategoryId, // category id 에 랜덤번호 부여
+        category_id: randomCategoryId,
       },
       {
         headers: {
@@ -61,7 +57,6 @@ export default function LikedPage() {
       },
     )
   }
-
   const fetchData = async () => {
     setIsLoading(true)
     try {
@@ -72,14 +67,12 @@ export default function LikedPage() {
         },
       })
       const newData = response.data
-
       setTotalCount(newData.length)
       if (newData.length === 0) {
         setHasMore(false)
       } else {
         setAllData(newData)
         setData(newData.slice(0, 5))
-
         const totalOriginalPrice = newData.reduce((sum: number, item: any) => sum + item.origin_price, 0)
         const totalDiscountedPrice = newData.reduce((sum: number, item: any) => sum + item.price, 0)
         setTotalOriginalPrice(totalOriginalPrice)
@@ -92,7 +85,6 @@ export default function LikedPage() {
       setIsLoading(false)
     }
   }
-
   useEffect(() => {
     if (token) {
       fetchData()
@@ -114,48 +106,11 @@ export default function LikedPage() {
     }
   }, [page, categoryPage, selectedCategory, allData])
 
-  const { ref } = useInView({
-    threshold: 1.0,
-    onChange: (inView) => {
-      if (inView && hasMore && !isLoading) {
-        if (selectedCategory === null) {
-          setPage((prevPage) => prevPage + 1)
-        } else {
-          setCategoryPage((prevPage) => prevPage + 1)
-        }
-      }
-    },
-  })
-
-  const mutation = useMutation<AxiosResponse<LikedProducts>, Error, void>({
-    mutationFn: postLike,
-    onSuccess: () => {
-      console.log('좋아요 성공')
-      queryClient.invalidateQueries({
-        queryKey: ['product'],
-      })
-    },
-    onError: () => {
-      console.error('에러 발생')
-    },
-  })
-
   const handleClickMenu = () => {
     setMenu(!menu)
   }
   const handleClickLogo = () => {
     navigate('/')
-  }
-  const handlePostDate = () => {
-    mutation.mutate()
-  }
-
-  const logout = () => {
-    localStorage.removeItem('accessToken')
-    Cookies.remove('refreshToken')
-    navigate('/')
-
-    alert('로그아웃 성공')
   }
   const handleCategoryClick = (categoryId: number | null) => {
     setSelectedCategory(categoryId)
@@ -174,6 +129,18 @@ export default function LikedPage() {
       setHasMore(filtered.length > 5)
     }
   }
+  const { ref } = useInView({
+    threshold: 1.0,
+    onChange: (inView) => {
+      if (inView && hasMore && !isLoading) {
+        if (selectedCategory === null) {
+          setPage((prevPage) => prevPage + 1)
+        } else {
+          setCategoryPage((prevPage) => prevPage + 1)
+        }
+      }
+    },
+  })
 
   const displayedData = selectedCategory === null ? data : data.filter((product) => product.category_id === selectedCategory)
 
@@ -191,15 +158,9 @@ export default function LikedPage() {
             <div className="absolute z-10 border xl:-right-40 xl:top-3 top-16 border-black/5 right-1">
               <div className="z-0 absolute w-5 h-5 transform rotate-45 border border-black/3 -translate-x-1/2 shadow-xl bg-mainBg xl:top-2 xl:-left-[1px] -top-2 left-24 sm:left-24" />
               <div className="relative flex flex-col items-center justify-center w-32 gap-4 p-2 text-center shadow-xl h-36 bg-mainBg">
-                <button className="hover:text-hongsi" onClick={handleClickLogo}>
-                  메인페이지
-                </button>
-                <button className="hover:text-hongsi" onClick={handlePostDate}>
-                  깃허브
-                </button>
-                <button className="hover:text-hongsi" onClick={logout}>
-                  로그아웃
-                </button>
+                <MenuBtn>메인페이지</MenuBtn>
+                <MenuBtn>깃허브</MenuBtn>
+                <MenuBtn>로그아웃</MenuBtn>
               </div>
             </div>
           )}

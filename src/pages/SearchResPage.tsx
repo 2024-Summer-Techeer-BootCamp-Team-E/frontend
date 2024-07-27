@@ -191,7 +191,7 @@ export default function SearchResPage() {
         {hasMore && !isLoading && <div ref={ref} />}
       </div>
       {emptyData && (
-        <div className="flex flex-col items-center justify-center text-bold">
+        <div className="flex flex-col items-center justify-center mt-20 text-bold">
           <p>검색 결과가 없습니다.</p>
           <div className="fixed bottom-0">
             <Footer />
