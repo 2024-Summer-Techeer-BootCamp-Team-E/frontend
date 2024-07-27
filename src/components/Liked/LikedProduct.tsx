@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import { AxiosResponse } from 'axios'
 import Like from '../../assets/images/Like.png'
 import Liked from '../../assets/images/Liked.png'
 import { useState } from 'react'
@@ -25,9 +25,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
   }
 
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    // Generate a random category_id between 1 and 6
     const randomCategoryId = Math.floor(Math.random() * 6) + 1
-
     return axiosInstance.post(
       '/api/v1/likes/',
       {
@@ -36,7 +34,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
         delivery_charge,
         link,
         image_url,
-        category_id: randomCategoryId, // Use the random category_id here
+        category_id: randomCategoryId,
       },
       {
         headers: {
@@ -67,10 +65,6 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
     mutationFn: postLike,
     onSuccess: () => {
       console.log('좋아요 성공')
-      // 요청 성공 시 해당 queryKey 유효성 제거
-      // queryClient.invalidateQueries({
-      //   queryKey: ['product'],
-      // })
     },
     onError: () => {
       console.error('에러 발생')
@@ -117,7 +111,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
       <div className="flex justify-between my-4 text-sm sm:justify-between">
         <img src={image_url} alt="image" className="cursor-pointer w-28 h-28" onClick={handleClickLink} />
         <div className="flex flex-col my-4 text-sm sm:justify-between sm:flex-row">
-          <p className="font-semibold cursor-pointer xl:w-[410px] lg:w-[410px] md:w-64 w-48" onClick={handleClickLink}>
+          <p className="font-semibold cursor-pointer xl:w-[410px] lg:w-[410px] md:w-64 w-48 mr-4" onClick={handleClickLink}>
             {name}
           </p>
           <p className="lg:w-40 md:w-28 sm:w-20 text-black/50">
