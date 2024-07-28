@@ -1,4 +1,3 @@
-import Cookies from 'js-cookie'
 import MenuBtn from '../components/MenuBtn'
 import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
@@ -6,12 +5,9 @@ import CategoryBtn from '../components/Liked/CategoryBtn'
 import DoughnutChat from '../components/Liked/DoughnutChat'
 import LikedProduct from '../components/Liked/LikedProduct'
 import axiosInstance from '../components/User/axiosInstance'
-import { AxiosResponse } from 'axios'
-import { faker } from '@faker-js/faker'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInView } from 'react-intersection-observer'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 interface LikedProducts {
   id: number
   name: string
@@ -24,39 +20,18 @@ interface LikedProducts {
 }
 export default function LikedPage() {
   const navigate = useNavigate()
-  const token = localStorage.getItem('accessToken')
-  const queryClient = useQueryClient()
-  const [menu, setMenu] = useState(false)
   const [page, setPage] = useState(1)
+  const [menu, setMenu] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+  const [totalCount, setTotalCount] = useState(0)
+  const token = localStorage.getItem('accessToken')
   const [isLoading, setIsLoading] = useState(false)
+  const [categoryPage, setCategoryPage] = useState(1)
   const [data, setData] = useState<LikedProducts[]>([])
   const [allData, setAllData] = useState<LikedProducts[]>([])
-  const [totalCount, setTotalCount] = useState(0)
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
-  const [categoryPage, setCategoryPage] = useState(1)
   const [totalOriginalPrice, setTotalOriginalPrice] = useState(0)
   const [totalDiscountedPrice, setTotalDiscountedPrice] = useState(0)
-  const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    const randomCategoryId = Math.floor(Math.random() * 6) + 1
-    return axiosInstance.post(
-      '/api/v1/likes/',
-      {
-        name: faker.commerce.productName(),
-        price: 1000,
-        delivery_charge: 0,
-        link: faker.internet.url(),
-        image_url: faker.image.url(),
-        category_id: randomCategoryId,
-      },
-      {
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    )
-  }
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const fetchData = async () => {
     setIsLoading(true)
     try {
@@ -145,7 +120,7 @@ export default function LikedPage() {
   const displayedData = selectedCategory === null ? data : data.filter((product) => product.category_id === selectedCategory)
 
   return (
-    <div className="w-screen h-screen">
+    <div className="w-full h-screen">
       <div className="flex flex-col items-center px-2">
         <div className="flex px-6 relative items-center justify-between w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] h-14 my-6 bg-mainBg">
           <span className="text-xl font-bold cursor-pointer sm:text-2xl text-hongsi" onClick={handleClickLogo}>

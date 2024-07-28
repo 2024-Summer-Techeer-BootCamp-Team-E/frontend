@@ -9,7 +9,7 @@ export default function Footer() {
     navigate('/searchres', { state: { data: url } })
   }
   return (
-    <div className="flex items-center justify-center w-screen sm:justify-around min-h-20 bg-footer">
+    <div className="flex items-center justify-center w-full sm:justify-around min-h-20 bg-footer">
       <p className="text-white lg:text-2xl sm:block md:text-xl">Check the lowest price!</p>
       <div className="relative">
         <div className="relative flex-row items-center hidden px-4 bg-white border sm:flex w-72 lg:w-96 md:w-80 h-9 rounded-2xl">
