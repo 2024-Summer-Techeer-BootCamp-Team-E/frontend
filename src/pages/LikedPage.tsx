@@ -31,6 +31,9 @@ export default function LikedPage() {
   const [allData, setAllData] = useState<LikedProducts[]>([])
   const [totalOriginalPrice, setTotalOriginalPrice] = useState(0)
   const [totalDiscountedPrice, setTotalDiscountedPrice] = useState(0)
+  const [searchQuery, setSearchQuery] = useState('') // New state for search query
+  const [categoryTotals, setCategoryTotals] = useState<{ [key: number]: { totalOriginalPrice: number; totalDiscountedPrice: number } }>({})
+
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const fetchData = async () => {
     setIsLoading(true)
@@ -48,6 +51,17 @@ export default function LikedPage() {
       } else {
         setAllData(newData)
         setData(newData.slice(0, 5))
+
+        const totals: { [key: number]: { totalOriginalPrice: number; totalDiscountedPrice: number } } = {}
+        newData.forEach((item: LikedProducts) => {
+          if (!totals[item.category_id]) {
+            totals[item.category_id] = { totalOriginalPrice: 0, totalDiscountedPrice: 0 }
+          }
+          totals[item.category_id].totalOriginalPrice += item.origin_price
+          totals[item.category_id].totalDiscountedPrice += item.price
+        })
+        setCategoryTotals(totals)
+
         const totalOriginalPrice = newData.reduce((sum: number, item: any) => sum + item.origin_price, 0)
         const totalDiscountedPrice = newData.reduce((sum: number, item: any) => sum + item.price, 0)
         setTotalOriginalPrice(totalOriginalPrice)
@@ -60,6 +74,15 @@ export default function LikedPage() {
       setIsLoading(false)
     }
   }
+  const { ref } = useInView({
+    threshold: 0.2,
+    onChange: (inView) => {
+      if (inView && hasMore && !isLoading) {
+        setPage((prevPage) => prevPage + 1)
+      }
+    },
+  })
+
   useEffect(() => {
     if (token) {
       fetchData()
@@ -104,20 +127,25 @@ export default function LikedPage() {
       setHasMore(filtered.length > 5)
     }
   }
-  const { ref } = useInView({
-    threshold: 1.0,
-    onChange: (inView) => {
-      if (inView && hasMore && !isLoading) {
-        if (selectedCategory === null) {
-          setPage((prevPage) => prevPage + 1)
-        } else {
-          setCategoryPage((prevPage) => prevPage + 1)
-        }
-      }
-    },
-  })
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value.toLowerCase()
+    setSearchQuery(query)
 
-  const displayedData = selectedCategory === null ? data : data.filter((product) => product.category_id === selectedCategory)
+    const filteredData = allData.filter((product) => product.name.toLowerCase().includes(query))
+
+    setData(filteredData.slice(0, 5))
+    setPage(1)
+    setCategoryPage(1)
+    setTotalCount(filteredData.length)
+    setHasMore(filteredData.length > 5)
+  }
+
+  const displayedData =
+    selectedCategory === null
+      ? data.filter((product) => product.name.toLowerCase().includes(searchQuery))
+      : data.filter((product) => product.category_id === selectedCategory && product.name.toLowerCase().includes(searchQuery))
+
+  const currentTotals = selectedCategory === null ? { totalOriginalPrice, totalDiscountedPrice } : categoryTotals[selectedCategory] || { totalOriginalPrice: 0, totalDiscountedPrice: 0 }
 
   return (
     <div className="w-full h-screen">
@@ -143,7 +171,7 @@ export default function LikedPage() {
         <div className="flex px-6 items-center justify-between w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-14">
           <span className="text-xl font-bold text-black sm:text-2xl">좋아요</span>
           <div className="relative">
-            <input className="h-8 pl-8 text-sm bg-white border rounded-lg outline-none w-44 text-black/40" placeholder="검색" />
+            <input className="h-8 pl-8 text-sm bg-white border rounded-lg outline-none w-44 text-black/40" placeholder="검색" value={searchQuery} onChange={handleSearchChange} />
             <img src={Glass} alt="돋보기" className="absolute w-5 h-5 left-2 top-1.5" />
           </div>
         </div>
@@ -187,10 +215,12 @@ export default function LikedPage() {
           {displayedData && displayedData.map((product: LikedProducts) => <LikedProduct key={product.id} {...product} />)}
         </div>
         <div>{hasMore && !isLoading && <div ref={ref} />}</div>
-        <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] py-2 h-auto border-[7px] border-mainBg m-10">
-          <p className="m-6 text-2xl font-bold text-center">총 할인율</p>
-          <DoughnutChat totalOriginalPrice={totalOriginalPrice} totalDiscountedPrice={totalDiscountedPrice} />
-        </div>
+        {totalCount ?? (
+          <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] py-2 h-auto border-[7px] border-mainBg m-10">
+            <p className="m-6 text-2xl font-bold text-center">총 할인율</p>
+            <DoughnutChat totalOriginalPrice={currentTotals.totalOriginalPrice} totalDiscountedPrice={currentTotals.totalDiscountedPrice} />
+          </div>
+        )}
       </div>
     </div>
   )

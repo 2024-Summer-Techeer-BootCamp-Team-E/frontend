@@ -1,15 +1,16 @@
 import Main from '../../assets/images/Main.png'
 import Search from '../../assets/images/Search.png'
-import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { URLSearch } from '../../hooks/URLSearch'
 import { useNavigate } from 'react-router-dom'
 
 export default function MainSection1() {
   const navigate = useNavigate()
-  const [url, setUrl] = useState('')
-  const handleClickSubmit = () => {
+
+  const handleSubmit = (url: string) => {
     navigate('/searchres', { state: { data: url } })
   }
+
   return (
     <div className="flex flex-col items-center gap-3 justify-center mt-20 w-full h-[582px] " style={{ backgroundImage: `url(${Main})` }}>
       <motion.div
@@ -26,21 +27,10 @@ export default function MainSection1() {
         </div>
       </motion.div>
       <div className="relative z-0 flex items-center object-cover mt-12">
-        <input
-          type="text"
-          className="lg:w-[600px] md:w-[500px] md:h-16 h-12 sm:w-[450px] xs:w-96 w-80 px-4 py-2 md:text-xl lg:text-xl rounded-2xl shadow-md focus:outline-none"
-          placeholder="www.example.com"
-          value={url}
-          onChange={({ target: { value } }) => setUrl(value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleClickSubmit()
-            }
-          }}
-        />
+        <URLSearch inputClassName="lg:w-[600px] md:w-[500px] md:h-16 h-12 sm:w-[450px] xs:w-96 w-80 px-4 py-2 md:text-xl lg:text-xl rounded-2xl shadow-md focus:outline-none" onSubmit={handleSubmit} />
         <button
-          className="absolute flex items-center justify-center w-10 h-8 text-white shadow-md sm:w-12 sm:h-10 md:w-14 md:h-12 rounded-xl bg-hongsi hover:bg-orange-600 right-2 focus:outline-none "
-          onClick={handleClickSubmit}
+          className="absolute flex items-center justify-center w-10 h-8 text-white shadow-md sm:w-12 sm:h-10 md:w-14 md:h-12 rounded-xl bg-hongsi hover:bg-orange-600 right-2 focus:outline-none"
+          onClick={() => handleSubmit((document.querySelector('input[type="text"]') as HTMLInputElement).value)}
         >
           <img src={Search} alt="Search" className="w-6 h-6 lg:w-7 lg:h-7" />
         </button>
