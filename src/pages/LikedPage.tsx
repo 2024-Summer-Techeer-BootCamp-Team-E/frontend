@@ -158,19 +158,22 @@ export default function LikedPage() {
               의류
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(2)} isSelected={selectedCategory === 2}>
-              스포츠
+              가정
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(3)} isSelected={selectedCategory === 3}>
-              생필
+              전자
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(4)} isSelected={selectedCategory === 4}>
-              가전
+              뷰티
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(5)} isSelected={selectedCategory === 5}>
-              가구
+              오락
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(6)} isSelected={selectedCategory === 6}>
-              음식
+              자동차
+            </CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(7)} isSelected={selectedCategory === 7}>
+              기타
             </CategoryBtn>
           </div>
         </div>
