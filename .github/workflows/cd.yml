@@ -3,7 +3,8 @@ name: Deploy React
 on:
   push:
     branches:
-      - feat/#72 # 배포를 트리거할 브랜치 설정
+      - feat/#72
+
 jobs:
   build:
     runs-on: ubuntu-latest
