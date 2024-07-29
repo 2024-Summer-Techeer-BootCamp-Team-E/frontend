@@ -3,7 +3,7 @@ import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
 import DoughnutChat from '../components/Liked/DoughnutChat'
 import LikedProduct from '../components/Liked/LikedProduct'
-import CategoryBtn from '../components/Liked/CategoryBtn' // Import CategoryBtn
+import CategoryBtn from '../components/Liked/CategoryBtn'
 import { useState, useEffect } from 'react'
 import { faker } from '@faker-js/faker'
 import { useNavigate } from 'react-router-dom'
@@ -38,9 +38,10 @@ export default function LikedPage() {
   const [categoryPage, setCategoryPage] = useState(1)
   const [totalOriginalPrice, setTotalOriginalPrice] = useState(0)
   const [totalDiscountedPrice, setTotalDiscountedPrice] = useState(0)
+  const [searchQuery, setSearchQuery] = useState('') // New state for search query
+  const [categoryTotals, setCategoryTotals] = useState<{ [key: number]: { totalOriginalPrice: number; totalDiscountedPrice: number } }>({})
 
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    // 1부터 6까지 랜덤 번호
     const randomCategoryId = Math.floor(Math.random() * 6) + 1
 
     return axiosInstance.post(
@@ -51,7 +52,7 @@ export default function LikedPage() {
         delivery_charge: 0,
         link: faker.internet.url(),
         image_url: faker.image.url(),
-        category_id: randomCategoryId, // category id 에 랜덤번호 부여
+        category_id: randomCategoryId,
       },
       {
         headers: {
@@ -79,6 +80,16 @@ export default function LikedPage() {
       } else {
         setAllData(newData)
         setData(newData.slice(0, 5))
+
+        const totals: { [key: number]: { totalOriginalPrice: number; totalDiscountedPrice: number } } = {}
+        newData.forEach((item: LikedProducts) => {
+          if (!totals[item.category_id]) {
+            totals[item.category_id] = { totalOriginalPrice: 0, totalDiscountedPrice: 0 }
+          }
+          totals[item.category_id].totalOriginalPrice += item.origin_price
+          totals[item.category_id].totalDiscountedPrice += item.price
+        })
+        setCategoryTotals(totals)
 
         const totalOriginalPrice = newData.reduce((sum: number, item: any) => sum + item.origin_price, 0)
         const totalDiscountedPrice = newData.reduce((sum: number, item: any) => sum + item.price, 0)
@@ -175,7 +186,26 @@ export default function LikedPage() {
     }
   }
 
-  const displayedData = selectedCategory === null ? data : data.filter((product) => product.category_id === selectedCategory)
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value.toLowerCase()
+    setSearchQuery(query)
+
+    const filteredData = allData.filter((product) => product.name.toLowerCase().includes(query))
+
+    setData(filteredData.slice(0, 5))
+    setPage(1)
+    setCategoryPage(1)
+    setTotalCount(filteredData.length)
+    setHasMore(filteredData.length > 5)
+  }
+
+  const displayedData =
+    selectedCategory === null
+      ? data.filter((product) => product.name.toLowerCase().includes(searchQuery))
+      : data.filter((product) => product.category_id === selectedCategory && product.name.toLowerCase().includes(searchQuery))
+
+  const currentTotals = selectedCategory === null ? { totalOriginalPrice, totalDiscountedPrice } : categoryTotals[selectedCategory] || { totalOriginalPrice: 0, totalDiscountedPrice: 0 }
 
   return (
     <div className="w-screen h-screen">
@@ -207,7 +237,7 @@ export default function LikedPage() {
         <div className="flex px-6 items-center justify-between w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] bg-mainBg h-14">
           <span className="text-xl font-bold text-black sm:text-2xl">좋아요</span>
           <div className="relative">
-            <input className="h-8 pl-8 text-sm bg-white border rounded-lg outline-none w-44 text-black/40" placeholder="검색" />
+            <input className="h-8 pl-8 text-sm bg-white border rounded-lg outline-none w-44 text-black/40" placeholder="검색" value={searchQuery} onChange={handleSearchChange} />
             <img src={Glass} alt="돋보기" className="absolute w-5 h-5 left-2 top-1.5" />
           </div>
         </div>
@@ -248,10 +278,12 @@ export default function LikedPage() {
           {displayedData && displayedData.map((product: LikedProducts) => <LikedProduct key={product.id} {...product} />)}
         </div>
         <div>{hasMore && !isLoading && <div ref={ref} />}</div>
-        <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] py-2 h-auto border-[7px] border-mainBg m-10">
-          <p className="m-6 text-2xl font-bold text-center">총 할인율</p>
-          <DoughnutChat totalOriginalPrice={totalOriginalPrice} totalDiscountedPrice={totalDiscountedPrice} />
-        </div>
+        {totalCount ?? (
+          <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] py-2 h-auto border-[7px] border-mainBg m-10">
+            <p className="m-6 text-2xl font-bold text-center">총 할인율</p>
+            <DoughnutChat totalOriginalPrice={currentTotals.totalOriginalPrice} totalDiscountedPrice={currentTotals.totalDiscountedPrice} />
+          </div>
+        )}
       </div>
     </div>
   )
