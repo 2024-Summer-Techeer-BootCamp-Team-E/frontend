@@ -9,7 +9,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn build
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.0
@@ -20,10 +30,5 @@ jobs:
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
             whoami
-            cd /home/ubuntu/frontend
+            cd /home/ubuntu/alddeul/frontend/
             sudo git pull origin master
-            export NVM_DIR=~/.nvm
-            source ~/.nvm/nvm.sh
-            yarn install
-            yarn build
-            sudo systemctl reload nginx
