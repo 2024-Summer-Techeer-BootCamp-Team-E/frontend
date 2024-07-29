@@ -27,7 +27,11 @@ export default function MainSection1() {
         </div>
       </motion.div>
       <div className="relative z-0 flex items-center object-cover mt-12">
-        <URLSearch inputClassName="lg:w-[600px] md:w-[500px] md:h-16 h-12 sm:w-[450px] xs:w-96 w-80 px-4 py-2 md:text-xl lg:text-xl rounded-2xl shadow-md focus:outline-none" onSubmit={handleSubmit} />
+        <URLSearch
+          inputClassName="lg:w-[600px] md:w-[500px] md:h-16 h-12 sm:w-[450px] xs:w-96 w-80 px-4 py-2 md:text-xl lg:text-xl rounded-2xl shadow-md focus:outline-none"
+          onSubmit={handleSubmit}
+          value={''}
+        />
         <button
           className="absolute flex items-center justify-center w-10 h-8 text-white shadow-md sm:w-12 sm:h-10 md:w-14 md:h-12 rounded-xl bg-hongsi hover:bg-orange-600 right-2 focus:outline-none"
           onClick={() => handleSubmit((document.querySelector('input[type="text"]') as HTMLInputElement).value)}
