@@ -64,6 +64,11 @@ const LoginModal = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleLogin()
+            }
+          }}
         />
         <button className="mt-5 text-xl font-bold text-white border rounded-lg shadow-lg w-80 h-11 bg-hongsi" onClick={handleLogin}>
           로그인

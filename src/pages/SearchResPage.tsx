@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import Cookies from 'js-cookie'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useInView } from 'react-intersection-observer'
 import Footer from '../components/Footer'
+import MenuBtn from '../components/MenuBtn'
 import Skeleton from 'react-loading-skeleton'
 import Glass from '../assets/images/Glass.png'
+import URLSearch from '../../src/hooks/URLSearch'
 import 'react-loading-skeleton/dist/skeleton.css'
 import useModalStore from '../store/useModalStore'
 import LoginModal from '../components/User/LoginModal'
@@ -14,7 +12,9 @@ import SignupModal from '../components/User/SignupModal'
 import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
 import SkeletonUI1 from '../components/SearchRes/SkeletonUI1'
-import URLSearch from '../../src/hooks/URLSearch'
+import { useEffect, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 interface ALiState {
   name: string
@@ -32,6 +32,7 @@ export default function SearchResPage() {
   const initialUrl = location.state?.data || ''
   const [page, setPage] = useState(1)
   const [skUi, setSkUi] = useState(true)
+  const [emptyData, setEmptyData] = useState(false)
   const [menu, setMenu] = useState(false)
   const [ui, setUi] = useState(false)
   const [hasMore, setHasMore] = useState(true)
@@ -58,49 +59,36 @@ export default function SearchResPage() {
     navigate('/')
   }
 
-  const HandleClickLiked = () => {
-    if (token) {
-      navigate('/liked')
-    } else {
-      alert('로그인이 필요합니다.')
-    }
-  }
-
-  const logout = () => {
-    localStorage.removeItem('accessToken')
-    Cookies.remove('refreshToken')
-    navigate('/')
-    window.location.reload()
-    alert('로그아웃 성공')
-  }
-
   const postKeyword = async () => {
-    console.log('P유아렐: ', url)
     try {
       const response = await axios.post('/api/v1/products/keyword/', {
         search_url: url,
       })
-      console.log(response.data)
+      console.log(response.data.keyword)
     } catch (error) {
+      alert('검색2에 실패하였습니다.')
       console.log('Error', error)
     }
   }
 
   const fetchAli = async (currentPage: number) => {
     setIsLoading(true)
-    console.log('F유아렐: ', linkData.search_url)
-    if (linkData.name) {
+    if (linkData.name && !emptyData) {
       try {
         const response = await axios.post('/api/v1/products/info/', {
           search_url: linkData.search_url,
         })
         setUi(true)
-        console.log('확인용 : ', response.data)
+        if (response.data.length === 0) {
+          setHasMore(false)
+          console.log('검색 결과 없네')
+          setEmptyData(true)
+          return
+        }
         const newData = response.data.map((item: ALiState, index: number) => ({
           ...item,
           id: index + currentPage * 1000,
         }))
-        console.log('데이터 : ', newData)
         if (newData.length === 0) {
           setHasMore(false)
         } else {
@@ -115,6 +103,7 @@ export default function SearchResPage() {
           })
         }
       } catch (error) {
+        alert('검색에 실패하였습니다.')
         console.error('Error:', error)
         setHasMore(false)
       } finally {
@@ -124,14 +113,10 @@ export default function SearchResPage() {
   }
 
   const postScrape = async () => {
-    console.log('/에서 온 url : ', url)
-    console.log('스크래핑 중,,, (한 6초 걸릴 듯)')
     try {
       const response = await axios.post('/api/v1/products/scrape/', {
         url,
       })
-      console.log('링크: ', url)
-      console.log(response.data)
       setLinkData(response.data)
       setSkUi(false)
       await postKeyword()
@@ -180,7 +165,7 @@ export default function SearchResPage() {
   }
 
   return (
-    <div className="flex flex-col justify-start w-screen h-screen">
+    <div className="flex flex-col w-full h-screen">
       <div className="flex flex-col items-center gap-5 px-2">
         <div className="flex relative items-center justify-between px-6 bg-mainBg w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] h-14 mt-5">
           <span className="text-2xl font-bold cursor-pointer text-hongsi" onClick={HandleClickLogo}>
@@ -197,24 +182,10 @@ export default function SearchResPage() {
             <div className="absolute z-10 border xl:-right-40 xl:top-2 top-20 border-black/5 right-5">
               <div className="z-0 absolute w-5 h-5 transform rotate-45 border border-black/3 -translate-x-1/2 shadow-xl bg-mainBg xl:top-2 xl:-left-[1px] -top-2 left-24" />
               <div className="relative flex flex-col items-center justify-center w-32 gap-4 p-2 text-center shadow-xl h-44 bg-mainBg">
-                <button className="hover:text-hongsi" onClick={HandleClickLogo}>
-                  메인페이지
-                </button>
-                <button className="hover:text-hongsi" onClick={HandleClickLiked}>
-                  좋아요
-                </button>
-                <button className="hover:text-hongsi" onClick={postKeyword}>
-                  깃허브
-                </button>
-                {token ? (
-                  <button className="hover:text-hongsi" onClick={logout}>
-                    로그아웃
-                  </button>
-                ) : (
-                  <button className="hover:text-hongsi" onClick={openLoginModal}>
-                    로그인
-                  </button>
-                )}
+                <MenuBtn>메인페이지</MenuBtn>
+                <MenuBtn>좋아요</MenuBtn>
+                <MenuBtn>깃허브</MenuBtn>
+                {token ? <MenuBtn>로그아웃</MenuBtn> : <MenuBtn>로그인</MenuBtn>}
                 {isLoginModalOpen && <LoginModal />}
                 {isSignupModalOpen && <SignupModal />}
               </div>
@@ -252,7 +223,15 @@ export default function SearchResPage() {
         </div>
         {hasMore && !isLoading && <div ref={ref} />}
       </div>
-      {!hasMore && <Footer />}
+      {emptyData && (
+        <div className="flex flex-col items-center justify-center w-full mt-20 text-bold">
+          <p>검색 결과가 없습니다.</p>
+          <div className="fixed bottom-0 w-full">
+            <Footer />
+          </div>
+        </div>
+      )}
+      {!hasMore && !emptyData && <Footer />}
     </div>
   )
 }

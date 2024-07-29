@@ -29,7 +29,7 @@ const Header = ({ token }: { token: string | null }) => {
     }
   }
   return (
-    <header className="fixed top-0 left-0 z-10 flex items-center justify-between w-screen h-20 bg-white">
+    <header className="fixed top-0 left-0 z-10 flex items-center justify-between w-full h-20 bg-white">
       <div className="flex items-center ml-6 text-md sm:text-2xl">
         <div className="font-bold cursor-pointer text-hongsi">알뜰</div>
         <img src={Logo} alt="Logo" className="hidden sm:block sm:w-[70px] sm:h-[90px]" />

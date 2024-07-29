@@ -10,7 +10,7 @@ import PayCheck from '../../assets/images/PayCheck.png'
 
 export default function MainSection2() {
   return (
-    <div className="w-screen h-auto border shadow-md bg-mainBg rounded-b-3xl">
+    <div className="w-full h-auto border shadow-md bg-mainBg rounded-b-3xl">
       <div className="mx-12 lg:mx-48 md:mx-32">
         <div className="flex items-center justify-center">
           <img src={Arrow} alt="Arrow" className="w-28 h-28" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })} />

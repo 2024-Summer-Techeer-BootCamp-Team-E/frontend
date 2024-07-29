@@ -12,7 +12,7 @@ export default function MainSection1() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-3 justify-center mt-20 w-screen h-[582px]" style={{ backgroundImage: `url(${Main})` }}>
+    <div className="flex flex-col items-center gap-3 justify-center mt-20 w-full h-[582px] " style={{ backgroundImage: `url(${Main})` }}>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}

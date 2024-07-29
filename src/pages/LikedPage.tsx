@@ -1,17 +1,13 @@
-import { AxiosResponse } from 'axios'
+import MenuBtn from '../components/MenuBtn'
 import Glass from '../assets/images/Glass.png'
 import HamburgerMenu from '../components/HamburgerMenu'
+import CategoryBtn from '../components/Liked/CategoryBtn'
 import DoughnutChat from '../components/Liked/DoughnutChat'
 import LikedProduct from '../components/Liked/LikedProduct'
-import CategoryBtn from '../components/Liked/CategoryBtn'
-import { useState, useEffect } from 'react'
-import { faker } from '@faker-js/faker'
-import { useNavigate } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useInView } from 'react-intersection-observer'
-import Cookies from 'js-cookie'
 import axiosInstance from '../components/User/axiosInstance'
-
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useInView } from 'react-intersection-observer'
 interface LikedProducts {
   id: number
   name: string
@@ -22,47 +18,23 @@ interface LikedProducts {
   category_id: number
   origin_price: number
 }
-
 export default function LikedPage() {
   const navigate = useNavigate()
-  const token = localStorage.getItem('accessToken')
-  const queryClient = useQueryClient()
-  const [menu, setMenu] = useState(false)
   const [page, setPage] = useState(1)
+  const [menu, setMenu] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+  const [totalCount, setTotalCount] = useState(0)
+  const token = localStorage.getItem('accessToken')
   const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState<LikedProducts[]>([])
-  const [allData, setAllData] = useState<LikedProducts[]>([]) // This will store all the fetched data
-  const [totalCount, setTotalCount] = useState(0) // Store the total count of the data
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null) // State for selected category
   const [categoryPage, setCategoryPage] = useState(1)
+  const [data, setData] = useState<LikedProducts[]>([])
+  const [allData, setAllData] = useState<LikedProducts[]>([])
   const [totalOriginalPrice, setTotalOriginalPrice] = useState(0)
   const [totalDiscountedPrice, setTotalDiscountedPrice] = useState(0)
   const [searchQuery, setSearchQuery] = useState('') // New state for search query
   const [categoryTotals, setCategoryTotals] = useState<{ [key: number]: { totalOriginalPrice: number; totalDiscountedPrice: number } }>({})
 
-  const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    const randomCategoryId = Math.floor(Math.random() * 6) + 1
-
-    return axiosInstance.post(
-      '/api/v1/likes/',
-      {
-        name: faker.commerce.productName(),
-        price: 1000,
-        delivery_charge: 0,
-        link: faker.internet.url(),
-        image_url: faker.image.url(),
-        category_id: randomCategoryId,
-      },
-      {
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    )
-  }
-
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const fetchData = async () => {
     setIsLoading(true)
     try {
@@ -73,7 +45,6 @@ export default function LikedPage() {
         },
       })
       const newData = response.data
-
       setTotalCount(newData.length)
       if (newData.length === 0) {
         setHasMore(false)
@@ -103,6 +74,14 @@ export default function LikedPage() {
       setIsLoading(false)
     }
   }
+  const { ref } = useInView({
+    threshold: 0.2,
+    onChange: (inView) => {
+      if (inView && hasMore && !isLoading) {
+        setPage((prevPage) => prevPage + 1)
+      }
+    },
+  })
 
   useEffect(() => {
     if (token) {
@@ -125,48 +104,11 @@ export default function LikedPage() {
     }
   }, [page, categoryPage, selectedCategory, allData])
 
-  const { ref } = useInView({
-    threshold: 1.0,
-    onChange: (inView) => {
-      if (inView && hasMore && !isLoading) {
-        if (selectedCategory === null) {
-          setPage((prevPage) => prevPage + 1)
-        } else {
-          setCategoryPage((prevPage) => prevPage + 1)
-        }
-      }
-    },
-  })
-
-  const mutation = useMutation<AxiosResponse<LikedProducts>, Error, void>({
-    mutationFn: postLike,
-    onSuccess: () => {
-      console.log('좋아요 성공')
-      queryClient.invalidateQueries({
-        queryKey: ['product'],
-      })
-    },
-    onError: () => {
-      console.error('에러 발생')
-    },
-  })
-
   const handleClickMenu = () => {
     setMenu(!menu)
   }
   const handleClickLogo = () => {
     navigate('/')
-  }
-  const handlePostDate = () => {
-    mutation.mutate()
-  }
-
-  const logout = () => {
-    localStorage.removeItem('accessToken')
-    Cookies.remove('refreshToken')
-    navigate('/')
-
-    alert('로그아웃 성공')
   }
   const handleCategoryClick = (categoryId: number | null) => {
     setSelectedCategory(categoryId)
@@ -185,8 +127,6 @@ export default function LikedPage() {
       setHasMore(filtered.length > 5)
     }
   }
-
-  // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase()
     setSearchQuery(query)
@@ -208,7 +148,7 @@ export default function LikedPage() {
   const currentTotals = selectedCategory === null ? { totalOriginalPrice, totalDiscountedPrice } : categoryTotals[selectedCategory] || { totalOriginalPrice: 0, totalDiscountedPrice: 0 }
 
   return (
-    <div className="w-screen h-screen">
+    <div className="w-full h-screen">
       <div className="flex flex-col items-center px-2">
         <div className="flex px-6 relative items-center justify-between w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] h-14 my-6 bg-mainBg">
           <span className="text-xl font-bold cursor-pointer sm:text-2xl text-hongsi" onClick={handleClickLogo}>
@@ -221,15 +161,9 @@ export default function LikedPage() {
             <div className="absolute z-10 border xl:-right-40 xl:top-3 top-16 border-black/5 right-1">
               <div className="z-0 absolute w-5 h-5 transform rotate-45 border border-black/3 -translate-x-1/2 shadow-xl bg-mainBg xl:top-2 xl:-left-[1px] -top-2 left-24 sm:left-24" />
               <div className="relative flex flex-col items-center justify-center w-32 gap-4 p-2 text-center shadow-xl h-36 bg-mainBg">
-                <button className="hover:text-hongsi" onClick={handleClickLogo}>
-                  메인페이지
-                </button>
-                <button className="hover:text-hongsi" onClick={handlePostDate}>
-                  깃허브
-                </button>
-                <button className="hover:text-hongsi" onClick={logout}>
-                  로그아웃
-                </button>
+                <MenuBtn>메인페이지</MenuBtn>
+                <MenuBtn>깃허브</MenuBtn>
+                <MenuBtn>로그아웃</MenuBtn>
               </div>
             </div>
           )}
@@ -252,19 +186,22 @@ export default function LikedPage() {
               의류
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(2)} isSelected={selectedCategory === 2}>
-              스포츠
+              가정
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(3)} isSelected={selectedCategory === 3}>
-              생필
+              전자
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(4)} isSelected={selectedCategory === 4}>
-              가전
+              뷰티
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(5)} isSelected={selectedCategory === 5}>
-              가구
+              오락
             </CategoryBtn>
             <CategoryBtn onClick={() => handleCategoryClick(6)} isSelected={selectedCategory === 6}>
-              음식
+              자동차
+            </CategoryBtn>
+            <CategoryBtn onClick={() => handleCategoryClick(7)} isSelected={selectedCategory === 7}>
+              기타
             </CategoryBtn>
           </div>
         </div>
@@ -278,7 +215,7 @@ export default function LikedPage() {
           {displayedData && displayedData.map((product: LikedProducts) => <LikedProduct key={product.id} {...product} />)}
         </div>
         <div>{hasMore && !isLoading && <div ref={ref} />}</div>
-        {totalCount ?? (
+        {totalCount !== 0 && (
           <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] py-2 h-auto border-[7px] border-mainBg m-10">
             <p className="m-6 text-2xl font-bold text-center">총 할인율</p>
             <DoughnutChat totalOriginalPrice={currentTotals.totalOriginalPrice} totalDiscountedPrice={currentTotals.totalDiscountedPrice} />
