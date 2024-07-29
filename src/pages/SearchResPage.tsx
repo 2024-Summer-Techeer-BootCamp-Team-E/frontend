@@ -1,5 +1,8 @@
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useInView } from 'react-intersection-observer'
 import Footer from '../components/Footer'
 import Skeleton from 'react-loading-skeleton'
 import Glass from '../assets/images/Glass.png'
@@ -11,9 +14,8 @@ import SignupModal from '../components/User/SignupModal'
 import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
 import SkeletonUI1 from '../components/SearchRes/SkeletonUI1'
-import { useEffect, useState } from 'react'
-import { useInView } from 'react-intersection-observer'
-import { useLocation, useNavigate } from 'react-router-dom'
+import URLSearch from '../../src/hooks/URLSearch'
+
 interface ALiState {
   name: string
   price: string
@@ -23,10 +25,11 @@ interface ALiState {
   category_id: number
   id: number
 }
+
 export default function SearchResPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const url = location.state.data
+  const initialUrl = location.state?.data || ''
   const [page, setPage] = useState(1)
   const [skUi, setSkUi] = useState(true)
   const [menu, setMenu] = useState(false)
@@ -35,6 +38,7 @@ export default function SearchResPage() {
   const [data, setData] = useState<ALiState[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const token = localStorage.getItem('accessToken')
+  const [url, setUrl] = useState(initialUrl)
   const [linkData, setLinkData] = useState<ALiState>({
     name: '',
     price: '',
@@ -45,12 +49,15 @@ export default function SearchResPage() {
     id: 0,
   })
   const { isLoginModalOpen, isSignupModalOpen, openLoginModal } = useModalStore()
+
   const handleClickMenu = () => {
     setMenu(!menu)
   }
+
   const HandleClickLogo = () => {
     navigate('/')
   }
+
   const HandleClickLiked = () => {
     if (token) {
       navigate('/liked')
@@ -58,6 +65,7 @@ export default function SearchResPage() {
       alert('로그인이 필요합니다.')
     }
   }
+
   const logout = () => {
     localStorage.removeItem('accessToken')
     Cookies.remove('refreshToken')
@@ -65,6 +73,7 @@ export default function SearchResPage() {
     window.location.reload()
     alert('로그아웃 성공')
   }
+
   const postKeyword = async () => {
     console.log('P유아렐: ', url)
     try {
@@ -113,6 +122,7 @@ export default function SearchResPage() {
       }
     }
   }
+
   const postScrape = async () => {
     console.log('/에서 온 url : ', url)
     console.log('스크래핑 중,,, (한 6초 걸릴 듯)')
@@ -129,12 +139,19 @@ export default function SearchResPage() {
       console.log('Error', error)
     }
   }
+
   useEffect(() => {
-    postScrape()
-  }, [])
+    if (url) {
+      postScrape()
+    }
+  }, [url])
+
   useEffect(() => {
-    fetchAli(page)
+    if (linkData.search_url) {
+      fetchAli(page)
+    }
   }, [page, linkData])
+
   const { ref } = useInView({
     threshold: 0.2,
     onChange: (inView) => {
@@ -143,6 +160,25 @@ export default function SearchResPage() {
       }
     },
   })
+
+  const handleUrlSubmit = (submittedUrl: string) => {
+    setUrl(submittedUrl) // 새로운 URL 설정
+    setPage(1) // 페이지 초기화
+    setData([]) // 이전 데이터 초기화
+    setUi(false) // UI 상태 초기화
+    setSkUi(true) // 로딩 중 스켈레톤 UI 표시
+    setHasMore(true) // 더 가져올 데이터가 있는지 여부 초기화
+    setLinkData({
+      name: '',
+      price: '',
+      delivery_charge: '',
+      search_url: '',
+      image_url: '',
+      category_id: 0,
+      id: 0,
+    }) // 링크 데이터 초기화
+  }
+
   return (
     <div className="flex flex-col justify-start w-screen h-screen">
       <div className="flex flex-col items-center gap-5 px-2">
@@ -150,8 +186,8 @@ export default function SearchResPage() {
           <span className="text-2xl font-bold cursor-pointer text-hongsi" onClick={HandleClickLogo}>
             알뜰살뜰
           </span>
-          <div className="relative ">
-            <input className="hidden md:block md:w-[300px] lg:w-[400px] xl:w-[500px] pl-8 bg-white border rounded-lg outline-none h-9 text-black/40" placeholder="www.example.com" />
+          <div className="relative">
+            <URLSearch onSubmit={handleUrlSubmit} value={url} inputClassName="md:block md:w-[300px] lg:w-[400px] xl:w-[500px] pl-8 bg-white border rounded-lg outline-none h-9 text-black/40" />
             <img src={Glass} alt="돋보기" className="absolute w-5 h-5 left-2 top-2" />
           </div>
           <div onClick={handleClickMenu}>
@@ -159,7 +195,7 @@ export default function SearchResPage() {
           </div>
           {menu && (
             <div className="absolute z-10 border xl:-right-40 xl:top-2 top-20 border-black/5 right-5">
-              <div className="z-0 absolute w-5 h-5 transform rotate-45 border border-black/3 -translate-x-1/2 shadow-xl bg-mainBg xl:top-2 xl:-left-[1px] -top-2 left-24 " />
+              <div className="z-0 absolute w-5 h-5 transform rotate-45 border border-black/3 -translate-x-1/2 shadow-xl bg-mainBg xl:top-2 xl:-left-[1px] -top-2 left-24" />
               <div className="relative flex flex-col items-center justify-center w-32 gap-4 p-2 text-center shadow-xl h-44 bg-mainBg">
                 <button className="hover:text-hongsi" onClick={HandleClickLogo}>
                   메인페이지
@@ -189,11 +225,10 @@ export default function SearchResPage() {
           <div className="flex items-center justify-center w-1/2">
             {skUi ? <Skeleton className="w-40 h-40 sm:w-52 sm:h-52" /> : <img src={linkData.image_url} className="w-40 h-40 sm:w-52 sm:h-52" />}
           </div>
-          <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold ">
+          <div className="flex flex-col w-1/2 gap-5 p-4 font-semibold">
             <p className="text-sm sm:text-base">{skUi ? <Skeleton className="text-sm sm:text-base" /> : linkData.name}</p>
             <p className="text-sm sm:text-base text-black/50">{skUi ? <Skeleton className="text-sm sm:text-base" /> : `Delivery : ₩${linkData.delivery_charge}`}</p>
             <p className="text-lg sm:text-2xl text-hongsi">{skUi ? <Skeleton className="text-sm sm:text-base" /> : `₩${linkData.price}`}</p>
-
             {skUi ? (
               <Skeleton className="text-sm sm:text-base" />
             ) : (
