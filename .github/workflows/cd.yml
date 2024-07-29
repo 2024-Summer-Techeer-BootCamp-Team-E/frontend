@@ -30,3 +30,10 @@ jobs:
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
             whoami
+            cd /home/ubuntu/frontend
+            sudo git pull origin master
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            yarn install
+            yarn build
+            sudo systemctl reload nginx
