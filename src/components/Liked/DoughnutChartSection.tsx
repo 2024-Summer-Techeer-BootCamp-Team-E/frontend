@@ -1,5 +1,5 @@
 import React from 'react'
-import DoughnutChat from '../Liked/DoughnutChat'
+import DoughnutChat from './DoughnutChat'
 
 interface DoughnutChartSectionProps {
   totalCount: number

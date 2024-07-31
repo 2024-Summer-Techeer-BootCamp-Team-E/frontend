@@ -25,7 +25,6 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
   }
 
   const postLike = async (): Promise<AxiosResponse<LikedProducts>> => {
-    const randomCategoryId = Math.floor(Math.random() * 6) + 1
     return axiosInstance.post(
       '/api/v1/likes/',
       {
@@ -34,7 +33,7 @@ export default function LikedProduct({ id, name, price, link, delivery_charge, i
         delivery_charge,
         link,
         image_url,
-        category_id: randomCategoryId,
+        category_id,
       },
       {
         headers: {
