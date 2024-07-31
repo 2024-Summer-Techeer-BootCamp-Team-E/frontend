@@ -58,7 +58,7 @@ export default function SearchResPage() {
   const HandleClickLogo = () => {
     navigate('/')
   }
-
+  //keyword
   const postKeyword = async () => {
     try {
       const response = await axios.post('/api/v1/products/keyword/', {
@@ -66,11 +66,11 @@ export default function SearchResPage() {
       })
       console.log(response.data.keyword)
     } catch (error) {
-      alert('검색2에 실패하였습니다.')
       console.log('Error', error)
     }
   }
 
+  //info
   const fetchAli = async (currentPage: number) => {
     setIsLoading(true)
     if (linkData.name && !emptyData) {
@@ -81,7 +81,7 @@ export default function SearchResPage() {
         setUi(true)
         if (response.data.length === 0) {
           setHasMore(false)
-          console.log('검색 결과 없네')
+
           setEmptyData(true)
           return
         }
@@ -103,7 +103,6 @@ export default function SearchResPage() {
           })
         }
       } catch (error) {
-        alert('검색에 실패하였습니다.')
         console.error('Error:', error)
         setHasMore(false)
       } finally {
@@ -112,12 +111,15 @@ export default function SearchResPage() {
     }
   }
 
+  //scrape
   const postScrape = async () => {
     try {
       const response = await axios.post('/api/v1/products/scrape/', {
         url,
       })
+      console.log(response, data)
       setLinkData(response.data)
+      setEmptyData(false)
       setSkUi(false)
       await postKeyword()
     } catch (error) {
@@ -135,7 +137,7 @@ export default function SearchResPage() {
     if (linkData.search_url) {
       fetchAli(page)
     }
-  }, [page, linkData])
+  }, [page, emptyData, linkData])
 
   const { ref } = useInView({
     threshold: 0.2,

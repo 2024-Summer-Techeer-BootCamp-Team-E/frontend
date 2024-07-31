@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInView } from 'react-intersection-observer'
 import axiosInstance from '../components/User/axiosInstance'
-import { LikedHeader } from '../components/LikedPageComponents/LikedHeader'
-import { SearchBar } from '../components/LikedPageComponents/SearchBar'
-import { Category } from '../components/LikedPageComponents/Category'
-import { ProductList } from '../components/LikedPageComponents/ProductList'
-import { DoughnutChartSection } from '../components/LikedPageComponents/DoughnutChartSection'
+import { LikedHeader } from '../components/Liked/LikedHeader'
+import { SearchBar } from '../components/Liked/SearchBar'
+import { Category } from '../components/Liked/Category'
+import { ProductList } from '../components/Liked/ProductList'
+import { DoughnutChartSection } from '../components/Liked/DoughnutChartSection'
 
 export interface LikedProducts {
   id: number

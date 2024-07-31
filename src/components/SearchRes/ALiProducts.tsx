@@ -65,7 +65,6 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
   const postMutation = useMutation<ALiState, Error, void>({
     mutationFn: postData,
     onSuccess: (data) => {
-      setLike(!like)
       console.log('좋아요 성공')
       queryClient.invalidateQueries({
         queryKey: ['product'],
@@ -74,6 +73,7 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       alert('좋아요 성공!')
     },
     onError: () => {
+      setLike(!like)
       alert('로그인이 필요합니다!')
       console.error('에러 발생')
     },
@@ -82,7 +82,6 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
   const deleteMutation = useMutation<AxiosResponse<ALiState>, Error, void>({
     mutationFn: deleteLike,
     onSuccess: () => {
-      setLike(!like)
       console.log('삭제 성공')
       queryClient.invalidateQueries({
         queryKey: ['product'],
@@ -90,14 +89,17 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       alert('좋아요 취소!')
     },
     onError: () => {
+      setLike(!like)
       console.error('에러 발생')
     },
   })
 
   const handleClickPostDelete = () => {
     if (like) {
+      setLike(!like)
       deleteMutation.mutate()
     } else {
+      setLike(!like)
       postMutation.mutate()
     }
   }

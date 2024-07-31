@@ -1,5 +1,5 @@
 import React from 'react'
-import CategoryBtn from '../Liked/CategoryBtn'
+import CategoryBtn from './CategoryBtn'
 
 interface CategoryButtonsProps {
   selectedCategory: number | null
@@ -25,7 +25,7 @@ export function Category({ selectedCategory, handleCategoryClick }: CategoryButt
         뷰티
       </CategoryBtn>
       <CategoryBtn onClick={() => handleCategoryClick(5)} isSelected={selectedCategory === 5}>
-        오락
+        스포츠
       </CategoryBtn>
       <CategoryBtn onClick={() => handleCategoryClick(6)} isSelected={selectedCategory === 6}>
         자동차

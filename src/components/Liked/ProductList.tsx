@@ -1,5 +1,5 @@
 import React from 'react'
-import LikedProduct from '../Liked/LikedProduct'
+import LikedProduct from './LikedProduct'
 import { LikedProducts } from '../../pages/LikedPage'
 
 interface ProductListProps {
