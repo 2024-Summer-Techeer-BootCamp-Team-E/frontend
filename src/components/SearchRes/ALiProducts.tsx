@@ -1,30 +1,27 @@
 import Like from '../../assets/images/Like.png'
 import Liked from '../../assets/images/Liked.png'
 import { useEffect, useState } from 'react'
-import axiosInstance, { AxiosResponse } from 'axios' // Import the custom axios instance
+import axiosInstance, { AxiosResponse } from 'axios'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import SkeletonUI1 from './SkeletonUI1'
-
 interface ALiState {
   id: number
   product_name: string
   price: string
   delivery_charge: string
-  link: string
   image_url: string
   category_id: number
+  link: string
   search_url: string
 }
-
 export default function ALiProducts({ product_name, price, delivery_charge, link, image_url, category_id, search_url }: ALiState) {
   const queryClient = useQueryClient()
   const [like, setLike] = useState(false)
   const [loading, setLoading] = useState(true)
   const token = localStorage.getItem('accessToken')
   const [pData, setPData] = useState<ALiState | null>(null)
-
   const postData = async () => {
     const response = await axiosInstance.post<ALiState>(
       '/api/v1/likes/',
@@ -37,7 +34,6 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
         category_id,
         search_url,
       },
-
       {
         headers: {
           accept: 'application/json',
@@ -48,7 +44,6 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
     )
     return response.data
   }
-
   const deleteLike = async (): Promise<AxiosResponse<ALiState>> => {
     if (!pData || !pData.id) {
       throw new Error('에러 발생')
@@ -61,7 +56,6 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       },
     })
   }
-
   const postMutation = useMutation<ALiState, Error, void>({
     mutationFn: postData,
     onSuccess: (data) => {
@@ -78,7 +72,6 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       console.error('에러 발생')
     },
   })
-
   const deleteMutation = useMutation<AxiosResponse<ALiState>, Error, void>({
     mutationFn: deleteLike,
     onSuccess: () => {
@@ -93,7 +86,6 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       console.error('에러 발생')
     },
   })
-
   const handleClickPostDelete = () => {
     if (like) {
       setLike(!like)
@@ -103,17 +95,14 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       postMutation.mutate()
     }
   }
-
   const handleClickLink = () => {
     window.open(link, '_blank')
   }
-
   useEffect(() => {
     setTimeout(() => {
       setLoading(false)
     }, 500)
   }, [])
-
   return (
     <div className="flex flex-col items-center justify-between gap-2 my-3 font-semibold xl:w-60 lg:w-[216px] md:w-56 w-full">
       {loading ? (
@@ -121,7 +110,7 @@ export default function ALiProducts({ product_name, price, delivery_charge, link
       ) : (
         <>
           <div className="relative flex flex-col items-center">
-            <div className="bg-[#eaeaea] rounded-md flex items-center justify-center mb-2">
+            <div className="bg-[#EAEAEA] rounded-md flex items-center justify-center mb-2">
               {loading ? (
                 <Skeleton className="xl:h-60 xl:w-60 lg:w-[216px] lg:h-[216px] md:w-56 md:h-56 max-w-56 max-h-56" />
               ) : (
