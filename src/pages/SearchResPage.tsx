@@ -74,6 +74,7 @@ export default function SearchResPage() {
       console.error('Error:', error)
       alert('검색에 실패하였습니다.')
       navigate('/')
+      window.location.reload()
       setHasMore(false)
     }
   }
