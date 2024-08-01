@@ -13,10 +13,17 @@ import OriginBtn from '../components/SearchRes/OriginBtn'
 import ALiProducts from '../components/SearchRes/ALiProducts'
 import SkeletonUI1 from '../components/SearchRes/SkeletonUI1'
 import { useEffect, useState } from 'react'
-import { useInView } from 'react-intersection-observer'
 import { useLocation, useNavigate } from 'react-router-dom'
-
 interface ALiState {
+  product_name: string
+  price: string
+  delivery_charge: string
+  link: string
+  image_url: string
+  category_id: number
+  id: number
+}
+interface OGState {
   name: string
   price: string
   delivery_charge: string
@@ -25,22 +32,20 @@ interface ALiState {
   category_id: number
   id: number
 }
-
 export default function SearchResPage() {
   const navigate = useNavigate()
   const location = useLocation()
+
   const initialUrl = location.state?.data || ''
-  const [page, setPage] = useState(1)
   const [skUi, setSkUi] = useState(true)
   const [emptyData, setEmptyData] = useState(false)
   const [menu, setMenu] = useState(false)
   const [ui, setUi] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const [data, setData] = useState<ALiState[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const token = localStorage.getItem('accessToken')
   const [url, setUrl] = useState(initialUrl)
-  const [linkData, setLinkData] = useState<ALiState>({
+  const [linkData, setLinkData] = useState<OGState>({
     name: '',
     price: '',
     delivery_charge: '',
@@ -49,112 +54,39 @@ export default function SearchResPage() {
     category_id: 0,
     id: 0,
   })
-  const { isLoginModalOpen, isSignupModalOpen, openLoginModal } = useModalStore()
-
+  const { isLoginModalOpen, isSignupModalOpen } = useModalStore()
   const handleClickMenu = () => {
     setMenu(!menu)
   }
-
   const HandleClickLogo = () => {
     navigate('/')
   }
-  //keyword
-  const postKeyword = async () => {
+  const fetchAli = async () => {
     try {
-      const response = await axios.post('/api/v1/products/keyword/', {
-        search_url: url,
+      const response = await axios.post('/api/v1/products/info/', {
+        url: initialUrl,
       })
-      console.log(response.data.keyword)
-    } catch (error) {
-      console.log('Error', error)
-    }
-  }
-
-  //info
-  const fetchAli = async (currentPage: number) => {
-    setIsLoading(true)
-    if (linkData.name && !emptyData) {
-      try {
-        const response = await axios.post('/api/v1/products/info/', {
-          search_url: linkData.search_url,
-        })
-        setUi(true)
-        if (response.data.length === 0) {
-          setHasMore(false)
-
-          setEmptyData(true)
-          return
-        }
-        const newData = response.data.map((item: ALiState, index: number) => ({
-          ...item,
-          id: index + currentPage * 1000,
-        }))
-        if (newData.length === 0) {
-          setHasMore(false)
-        } else {
-          const paginatedData = newData.slice((currentPage - 1) * 4, currentPage * 4)
-          if (paginatedData.length < 4) {
-            setHasMore(false)
-          }
-          setData((prevData) => {
-            const combinedData = [...prevData, ...paginatedData]
-            const uniqueData = combinedData.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i)
-            return uniqueData
-          })
-        }
-      } catch (error) {
-        console.error('Error:', error)
-        setHasMore(false)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-  }
-
-  //scrape
-  const postScrape = async () => {
-    try {
-      const response = await axios.post('/api/v1/products/scrape/', {
-        url,
-      })
-      console.log(response, data)
-      setLinkData(response.data)
-      setEmptyData(false)
+      setLinkData(response.data.search)
+      setData(response.data.products)
       setSkUi(false)
-      await postKeyword()
+      setUi(true)
     } catch (error) {
-      console.log('Error', error)
+      console.error('Error:', error)
+      alert('검색에 실패하였습니다.')
+      navigate('/')
+      setHasMore(false)
     }
   }
-
   useEffect(() => {
-    if (url) {
-      postScrape()
-    }
-  }, [url])
-
-  useEffect(() => {
-    if (linkData.search_url) {
-      fetchAli(page)
-    }
-  }, [page, emptyData, linkData])
-
-  const { ref } = useInView({
-    threshold: 0.2,
-    onChange: (inView) => {
-      if (inView && hasMore && !isLoading) {
-        setPage((prevPage) => prevPage + 1)
-      }
-    },
-  })
-
+    fetchAli()
+  }, [initialUrl])
   const handleUrlSubmit = (submittedUrl: string) => {
-    setUrl(submittedUrl) // 새로운 URL 설정
-    setPage(1) // 페이지 초기화
-    setData([]) // 이전 데이터 초기화
-    setUi(false) // UI 상태 초기화
-    setSkUi(true) // 로딩 중 스켈레톤 UI 표시
-    setHasMore(true) // 더 가져올 데이터가 있는지 여부 초기화
+    setUrl(submittedUrl)
+    setData([])
+    setUi(false)
+    setSkUi(true)
+    setHasMore(true)
+    setEmptyData(false)
     setLinkData({
       name: '',
       price: '',
@@ -163,9 +95,8 @@ export default function SearchResPage() {
       image_url: '',
       category_id: 0,
       id: 0,
-    }) // 링크 데이터 초기화
+    })
   }
-
   return (
     <div className="flex flex-col w-full h-screen">
       <div className="flex flex-col items-center gap-5 px-2">
@@ -214,7 +145,7 @@ export default function SearchResPage() {
         </div>
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[900px] xl:w-[62.5rem] grid lg:grid-cols-4 grid-cols-3 gap-3 mb-10">
           {ui && !skUi ? (
-            data.map((product: any) => <ALiProducts key={product.id} {...product} search_url={linkData.search_url} />)
+            data.map((product: ALiState, index: number) => <ALiProducts key={index} {...product} search_url={initialUrl} />)
           ) : (
             <>
               {Array.from({ length: 5 }).map((_, index) => (
@@ -223,7 +154,6 @@ export default function SearchResPage() {
             </>
           )}
         </div>
-        {hasMore && !isLoading && <div ref={ref} />}
       </div>
       {emptyData && (
         <div className="flex flex-col items-center justify-center w-full mt-20 text-bold">
